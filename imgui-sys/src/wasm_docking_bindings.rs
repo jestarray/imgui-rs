@@ -241,8 +241,9 @@ pub type ImGuiTableRowFlags = ::core::ffi::c_int;
 pub type ImGuiTreeNodeFlags = ::core::ffi::c_int;
 pub type ImGuiViewportFlags = ::core::ffi::c_int;
 pub type ImGuiWindowFlags = ::core::ffi::c_int;
+pub type ImWchar32 = ::core::ffi::c_uint;
 pub type ImWchar16 = ::core::ffi::c_ushort;
-pub type ImWchar = ImWchar16;
+pub type ImWchar = ImWchar32;
 pub type ImGuiSelectionUserData = ImS64;
 pub type ImGuiInputTextCallback = ::core::option::Option<
     unsafe extern "C" fn(data: *mut ImGuiInputTextCallbackData) -> ::core::ffi::c_int,
@@ -2737,7 +2738,7 @@ pub struct ImFont {
     pub Sources: ImVector_ImFontConfigPtr,
     pub EllipsisChar: ImWchar,
     pub FallbackChar: ImWchar,
-    pub Used8kPagesMap: [ImU8; 1usize],
+    pub Used8kPagesMap: [ImU8; 17usize],
     pub EllipsisAutoBake: bool,
     pub RemapPairs: ImGuiStorage,
 }

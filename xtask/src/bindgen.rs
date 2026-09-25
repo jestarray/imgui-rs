@@ -29,7 +29,7 @@ impl Bindgen {
                     variant, additional
                 ));
 
-                let types = get_types(&cimgui_output.join("structs_and_enums.json"))?;
+                let (types, enum_names) = get_types(&cimgui_output.join("structs_and_enums.json"))?;
                 let funcs = get_definitions(&cimgui_output.join("definitions.json"))?;
                 let header = cimgui_output.join("cimgui.h");
 
@@ -40,11 +40,19 @@ impl Bindgen {
                     (var, Some(f)) => format!("{}_{}_bindings.rs", var, f),
                 };
 
-                generate_binding_file(&header, &output.join(&output_name), &types, &funcs, None)?;
+                generate_binding_file(
+                    &header,
+                    &output.join(&output_name),
+                    &types,
+                    &enum_names,
+                    &funcs,
+                    None,
+                )?;
                 generate_binding_file(
                     &header,
                     &output.join(format!("wasm_{}", &output_name)),
                     &types,
+                    &enum_names,
                     &funcs,
                     Some(&wasm_name),
                 )?;
@@ -55,17 +63,18 @@ impl Bindgen {
     }
 }
 
-fn get_types(structs_and_enums: &Path) -> Result<Vec<String>> {
+fn get_types(structs_and_enums: &Path) -> Result<(Vec<String>, Vec<String>)> {
     let types_txt = std::fs::read_to_string(structs_and_enums)?;
     let types_val = types_txt
         .parse::<smoljson::ValOwn>()
         .map_err(|e| anyhow!("Failed to parse {}: {:?}", structs_and_enums.display(), e))?;
-    let mut types: Vec<String> = types_val["enums"]
+    let enum_names: Vec<String> = types_val["enums"]
         .as_object()
         .ok_or_else(|| anyhow!("No `enums` in bindings file"))?
         .keys()
-        .map(|k| format!("^{}", k))
+        .map(|k| k.to_string())
         .collect();
+    let mut types: Vec<String> = enum_names.iter().map(|name| format!("^{name}")).collect();
     types.extend(
         types_val["structs"]
             .as_object()
@@ -73,7 +82,7 @@ fn get_types(structs_and_enums: &Path) -> Result<Vec<String>> {
             .keys()
             .map(|k| format!("^{}", k)),
     );
-    Ok(types)
+    Ok((types, enum_names))
 }
 
 fn get_definitions(definitions: &Path) -> Result<Vec<String>> {
@@ -113,6 +122,7 @@ fn generate_binding_file(
     header: &Path,
     output: &Path,
     types: &[String],
+    enum_names: &[String],
     funcs: &[String],
     wasm_import_mod: Option<&str>,
 ) -> Result<()> {
@@ -133,7 +143,8 @@ fn generate_binding_file(
         .use_core()
         .blocklist_type("__darwin_size_t")
         .raw_line("#![allow(nonstandard_style, clippy::all)]")
-        .clang_arg("-DCIMGUI_DEFINE_ENUMS_AND_STRUCTS=1");
+        .clang_arg("-DCIMGUI_DEFINE_ENUMS_AND_STRUCTS=1")
+        .clang_arg("-DIMGUI_USE_WCHAR32=1");
 
     if let Some(name) = wasm_import_mod {
         builder = builder.wasm_import_module_name(name);
@@ -150,18 +161,28 @@ fn generate_binding_file(
     bindings
         .write_to_file(output)
         .context("Failed to write bindings")?;
-    patch_bindings(output)?;
+    patch_bindings(output, enum_names)?;
     eprintln!("Success [output = {}]", output.display());
 
     Ok(())
 }
 
-fn patch_bindings(output: &Path) -> Result<()> {
+fn patch_bindings(output: &Path, enum_names: &[String]) -> Result<()> {
     let text = fs::read_to_string(output)
         .with_context(|| format!("Failed to read bindings from {}", output.display()))?;
 
     let mut lines: Vec<String> = text.lines().map(|line| line.to_string()).collect();
     let mut changed = false;
+
+    // Newer Clang versions infer unsigned enum aliases here. Keep the signed
+    // aliases expected by imgui-rs and the existing generated bindings.
+    for name in enum_names {
+        let unsigned = format!("pub type {name} = ::core::ffi::c_uint;");
+        if let Some(line) = lines.iter_mut().find(|line| **line == unsigned) {
+            *line = format!("pub type {name} = ::core::ffi::c_int;");
+            changed = true;
+        }
+    }
 
     let structs = [
         "ImFontLoader",

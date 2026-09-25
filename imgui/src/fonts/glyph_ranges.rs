@@ -57,7 +57,7 @@ impl FontGlyphRanges {
     /// ======
     ///
     /// This function will panic if the given slice is not a valid font range.
-    pub fn from_slice(slice: &'static [u16]) -> FontGlyphRanges {
+    pub fn from_slice(slice: &'static [sys::ImWchar]) -> FontGlyphRanges {
         assert_eq!(
             slice.len() % 2,
             1,
@@ -77,7 +77,7 @@ impl FontGlyphRanges {
                 i
             );
             assert!(
-                glyph <= u16::MAX,
+                glyph <= 0x10FFFF,
                 "A glyph in a range cannot exceed the maximum codepoint. (Glyph is {:#x} at index {})",
                 glyph,
                 i,
@@ -120,7 +120,7 @@ impl FontGlyphRanges {
     /// # Safety
     ///
     /// It is up to the caller to guarantee the slice contents are valid.
-    pub unsafe fn from_slice_unchecked(slice: &'static [u16]) -> FontGlyphRanges {
+    pub unsafe fn from_slice_unchecked(slice: &'static [sys::ImWchar]) -> FontGlyphRanges {
         FontGlyphRanges::from_ptr(slice.as_ptr())
     }
 
@@ -132,7 +132,7 @@ impl FontGlyphRanges {
     ///
     /// It is up to the caller to guarantee the pointer is not null, remains valid forever, and
     /// points to valid data.
-    pub unsafe fn from_ptr(ptr: *const u16) -> FontGlyphRanges {
+    pub unsafe fn from_ptr(ptr: *const sys::ImWchar) -> FontGlyphRanges {
         FontGlyphRanges(FontGlyphRangeData::Custom(ptr))
     }
 

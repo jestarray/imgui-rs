@@ -14,7 +14,7 @@ pub struct Font {
     pub sources: sys::ImVector_ImFontConfigPtr,
     pub ellipsis_char: sys::ImWchar,
     pub fallback_char: sys::ImWchar,
-    pub used_8k_pages_map: [sys::ImU8; 1],
+    pub used_8k_pages_map: [sys::ImU8; 17],
     pub ellipsis_auto_bake: bool,
     pub remap_pairs: sys::ImGuiStorage,
 }
