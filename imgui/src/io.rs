@@ -1,5 +1,4 @@
 use bitflags::bitflags;
-use std::f32;
 use std::ops::{Index, IndexMut};
 use std::os::raw::{c_char, c_void};
 use std::time::Duration;
