@@ -1,5 +1,5 @@
 use std::os::raw::c_float;
-use std::{f32, mem};
+use std::{mem};
 
 use super::Ui;
 
