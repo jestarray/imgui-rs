@@ -8,7 +8,7 @@ impl Ui {
             sys::igDockSpaceOverViewport(
                 0,
                 sys::igGetMainViewport(),
-                sys::ImGuiDockNodeFlags_PassthruCentralNode as i32,
+                sys::ImGuiDockNodeFlags_PassthruCentralNode,
                 null(),
             )
         }

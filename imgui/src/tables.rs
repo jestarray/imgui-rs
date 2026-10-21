@@ -35,116 +35,116 @@ bitflags! {
         // Features
 
         /// Enable resizing columns.
-        const RESIZABLE = sys::ImGuiTableFlags_Resizable as i32;
+        const RESIZABLE = sys::ImGuiTableFlags_Resizable;
         /// Enable reordering columns in header row, though you must set up a header row
         /// with `begin_table_header` or `table_setup_column`.
-        const REORDERABLE =sys::ImGuiTableFlags_Reorderable as i32;
+        const REORDERABLE =sys::ImGuiTableFlags_Reorderable;
         /// Enable hiding/disabling columns in context menu.
-        const HIDEABLE = sys::ImGuiTableFlags_Hideable as i32;
+        const HIDEABLE = sys::ImGuiTableFlags_Hideable;
         /// Enable sorting. See `table_get_sort_specs` to object sort specs. Also see [SortMulti]
         /// and [SortTristate].
-        const SORTABLE = sys::ImGuiTableFlags_Sortable as i32;
+        const SORTABLE = sys::ImGuiTableFlags_Sortable;
         /// Disable persisting columns order, width, and sort settings in the .ini file.
-        const NO_SAVED_SETTINGS = sys::ImGuiTableFlags_NoSavedSettings as i32;
+        const NO_SAVED_SETTINGS = sys::ImGuiTableFlags_NoSavedSettings;
         /// Right-click on columns body/contents will display table context menu.
         /// By default you can only right click in a headers row.
-        const CONTEXT_MENU_IN_BODY = sys::ImGuiTableFlags_ContextMenuInBody as i32;
+        const CONTEXT_MENU_IN_BODY = sys::ImGuiTableFlags_ContextMenuInBody;
 
         // Decorations
 
         /// Set each RowBg color with [table_row_bg] or [table_row_bg_alt] (equivalent of calling
         /// `table_set_bg_color` with `ROW_BG0` on each row manually)
-        const ROW_BG = sys::ImGuiTableFlags_RowBg as i32;
+        const ROW_BG = sys::ImGuiTableFlags_RowBg;
         /// Draw horizontal borders between rows.
-        const BORDERS_INNER_H = sys::ImGuiTableFlags_BordersInnerH as i32;
+        const BORDERS_INNER_H = sys::ImGuiTableFlags_BordersInnerH;
         /// Draw horizontal borders at the top and bottom.
-        const BORDERS_OUTER_H = sys::ImGuiTableFlags_BordersOuterH as i32;
+        const BORDERS_OUTER_H = sys::ImGuiTableFlags_BordersOuterH;
         /// Draw vertical borders between columns.
-        const BORDERS_INNER_V = sys::ImGuiTableFlags_BordersInnerV as i32;
+        const BORDERS_INNER_V = sys::ImGuiTableFlags_BordersInnerV;
         /// Draw vertical borders on the left and right sides.
-        const BORDERS_OUTER_V = sys::ImGuiTableFlags_BordersOuterV as i32;
+        const BORDERS_OUTER_V = sys::ImGuiTableFlags_BordersOuterV;
         /// Draw all horizontal borders (this is just [BORDERS_INNER_H] | [BORDERS_OUTER_H]).
-        const BORDERS_H = sys::ImGuiTableFlags_BordersH as i32;
+        const BORDERS_H = sys::ImGuiTableFlags_BordersH;
         /// Draw all vertical borders (this is just [BORDERS_INNER_V] | [BORDERS_OUTER_V]).
-        const BORDERS_V = sys::ImGuiTableFlags_BordersV as i32;
+        const BORDERS_V = sys::ImGuiTableFlags_BordersV;
         /// Draw all inner borders (this is just [BORDERS_INNER_H] | [BORDERS_INNER_V]).
-        const BORDERS_INNER = sys::ImGuiTableFlags_BordersInner as i32;
+        const BORDERS_INNER = sys::ImGuiTableFlags_BordersInner;
         /// Draw all outer borders (this is just [BORDERS_OUTER_H] | [BORDERS_OUTER_V]).
-        const BORDERS_OUTER = sys::ImGuiTableFlags_BordersOuter as i32;
+        const BORDERS_OUTER = sys::ImGuiTableFlags_BordersOuter;
         /// Draw all borders (this is just [BORDERS_INNER] | [BORDERS_OUTER]).
-        const BORDERS = sys::ImGuiTableFlags_Borders as i32;
+        const BORDERS = sys::ImGuiTableFlags_Borders;
         /// **ALPHA** Disable vertical borders in columns Body (borders will always appears in Headers).
         /// May move to Style
-        const NO_BORDERS_IN_BODY = sys::ImGuiTableFlags_NoBordersInBody as i32;
+        const NO_BORDERS_IN_BODY = sys::ImGuiTableFlags_NoBordersInBody;
         /// **ALPHA** Disable vertical borders in columns Body until hovered for resize (borders will always appears in Headers).
         /// May move to style
-        const NO_BORDERS_IN_BODY_UNTIL_RESIZE = sys::ImGuiTableFlags_NoBordersInBodyUntilResize as i32;
+        const NO_BORDERS_IN_BODY_UNTIL_RESIZE = sys::ImGuiTableFlags_NoBordersInBodyUntilResize;
 
         // Sizing Policy (read above for defaults)
 
         /// Columns default to [WidthFixed] or [WidthAuto] (if resizable or not resizable),
         /// matching contents width.
-        const SIZING_FIXED_FIT = sys::ImGuiTableFlags_SizingFixedFit as i32;
+        const SIZING_FIXED_FIT = sys::ImGuiTableFlags_SizingFixedFit;
         /// Columns default to [WidthFixed] or [WidthAuto] (if resizable or not resizable),
         /// matching the maximum contents width of all columns.
         /// Implicitly enable [NoKeepColumnsVisible].
-        const SIZING_FIXED_SAME = sys::ImGuiTableFlags_SizingFixedSame as i32;
+        const SIZING_FIXED_SAME = sys::ImGuiTableFlags_SizingFixedSame;
         /// Columns default to [WidthStretch] with default weights proportional to each columns
         /// contents widths.
-        const SIZING_STRETCH_PROP = sys::ImGuiTableFlags_SizingStretchProp as i32;
+        const SIZING_STRETCH_PROP = sys::ImGuiTableFlags_SizingStretchProp;
         /// Columns default to [WidthStretch] with default weights all equal, unless overridden by
         /// a column's `TableHeader`.
-        const SIZING_STRETCH_SAME = sys::ImGuiTableFlags_SizingStretchSame as i32;
+        const SIZING_STRETCH_SAME = sys::ImGuiTableFlags_SizingStretchSame;
 
         // Sizing Extra Options
 
         /// Make outer width auto-fit to columns, overriding outer_size.x value. Only available when
         /// [ScrollX]/[ScrollY] are disabled and [Stretch] columns are not used.
-        const NO_HOST_EXTEND_X = sys::ImGuiTableFlags_NoHostExtendX as i32;
+        const NO_HOST_EXTEND_X = sys::ImGuiTableFlags_NoHostExtendX;
         /// Make outer height stop exactly at outer_size.y (prevent auto-extending table past the limit).
         /// Only available when [ScrollX]/[ScrollY] are disabled.
         /// Data below the limit will be clipped and not visible.
-        const NO_HOST_EXTEND_Y = sys::ImGuiTableFlags_NoHostExtendY as i32;
+        const NO_HOST_EXTEND_Y = sys::ImGuiTableFlags_NoHostExtendY;
         /// Disable keeping column always minimally visible when [ScrollX] is off and table
         /// gets too small. Not recommended if columns are resizable.
-        const NO_KEEP_COLUMNS_VISIBLE = sys::ImGuiTableFlags_NoKeepColumnsVisible as i32;
+        const NO_KEEP_COLUMNS_VISIBLE = sys::ImGuiTableFlags_NoKeepColumnsVisible;
         /// Disable distributing remainder width to stretched columns (width allocation on a 100-wide
         /// table with 3 columns: Without this flag: 33,33,34. With this flag: 33,33,33).
         /// With larger number of columns, resizing will appear to be less smooth.
-        const PRECISE_WIDTHS = sys::ImGuiTableFlags_PreciseWidths as i32;
+        const PRECISE_WIDTHS = sys::ImGuiTableFlags_PreciseWidths;
 
         // Clipping
 
         /// Disable clipping rectangle for every individual columns (reduce draw command count, items will
         /// be able to overflow into other columns). Generally incompatible with [table_setup_scroll_freeze].
-        const NO_CLIP = sys::ImGuiTableFlags_NoClip as i32;
+        const NO_CLIP = sys::ImGuiTableFlags_NoClip;
 
         // Padding
 
         /// Default if [BordersOuterV] is on. Enable outer-most padding. Generally desirable if you have headers.
-        const PAD_OUTER_X = sys::ImGuiTableFlags_PadOuterX as i32;
+        const PAD_OUTER_X = sys::ImGuiTableFlags_PadOuterX;
         /// Default if [BordersOuterV] is off. Disable outer-most padding.
-        const NO_PAD_OUTER_X = sys::ImGuiTableFlags_NoPadOuterX as i32;
+        const NO_PAD_OUTER_X = sys::ImGuiTableFlags_NoPadOuterX;
         /// Disable inner padding between columns (double inner padding if [BordersOuterV] is on, single
         /// inner padding if BordersOuterV is off).
-        const NO_PAD_INNER_X = sys::ImGuiTableFlags_NoPadInnerX as i32;
+        const NO_PAD_INNER_X = sys::ImGuiTableFlags_NoPadInnerX;
 
         // Scrolling
 
         /// Enable horizontal scrolling. Require 'outer_size' parameter of [begin_table] to specify the
         /// container size. Changes default sizing policy. Because this create a child window,
         /// [ScrollY] is currently generally recommended when using [ScrollX].
-        const SCROLL_X = sys::ImGuiTableFlags_ScrollX as i32;
+        const SCROLL_X = sys::ImGuiTableFlags_ScrollX;
         /// Enable vertical scrolling. Require 'outer_size' parameter of [begin_table] to specify the
         /// container size.
-        const SCROLL_Y = sys::ImGuiTableFlags_ScrollY as i32;
+        const SCROLL_Y = sys::ImGuiTableFlags_ScrollY;
 
         // Sorting
 
         /// Hold shift when clicking headers to sort on multiple column. [table_get_sort_specs] may return specs where `[spec_count] > 1`.
-        const SORT_MULTI = sys::ImGuiTableFlags_SortMulti as i32;
+        const SORT_MULTI = sys::ImGuiTableFlags_SortMulti;
         /// Allow no sorting, disable default sorting. `table_get_sort_specs` may return specs where `[specs_count] == 0`.
-        const SORT_TRISTATE = sys::ImGuiTableFlags_SortTristate as i32;
+        const SORT_TRISTATE = sys::ImGuiTableFlags_SortTristate;
     }
 }
 
@@ -154,7 +154,7 @@ bitflags! {
     pub struct TableRowFlags: i32 {
         /// Identify header row (set default background color + width of its contents
         /// accounted different for auto column width)
-        const HEADERS = sys::ImGuiTableRowFlags_Headers as i32;
+        const HEADERS = sys::ImGuiTableRowFlags_Headers;
     }
 }
 
@@ -166,56 +166,56 @@ bitflags! {
         // Input configuration flags
 
         /// Default as a hidden/disabled column.
-        const DEFAULT_HIDE = sys::ImGuiTableColumnFlags_DefaultHide as i32;
+        const DEFAULT_HIDE = sys::ImGuiTableColumnFlags_DefaultHide;
         /// Default as a sorting column.
-        const DEFAULT_SORT = sys::ImGuiTableColumnFlags_DefaultSort as i32;
+        const DEFAULT_SORT = sys::ImGuiTableColumnFlags_DefaultSort;
         /// Column will stretch. Preferable with horizontal scrolling disabled (default
         /// if table sizing policy is [ImGuiTableFlags::SizingStretchSame] or
         /// [ImGuiTableFlags::SizingStretchProp]).
-        const WIDTH_STRETCH = sys::ImGuiTableColumnFlags_WidthStretch as i32;
+        const WIDTH_STRETCH = sys::ImGuiTableColumnFlags_WidthStretch;
         /// Column will not stretch. Preferable with horizontal scrolling enabled (default
         /// if table sizing policy is [ImGuiTableFlags::SizingFixedFit] and table is resizable).
-        const WIDTH_FIXED = sys::ImGuiTableColumnFlags_WidthFixed as i32;
+        const WIDTH_FIXED = sys::ImGuiTableColumnFlags_WidthFixed;
         /// Disable manual resizing.
-        const NO_RESIZE = sys::ImGuiTableColumnFlags_NoResize as i32;
+        const NO_RESIZE = sys::ImGuiTableColumnFlags_NoResize;
         /// Disable manual reordering this column, this will also prevent other columns from
         /// crossing over this column.
-        const NO_REORDER = sys::ImGuiTableColumnFlags_NoReorder as i32;
+        const NO_REORDER = sys::ImGuiTableColumnFlags_NoReorder;
         /// Disable ability to hide/disable this column.
-        const NO_HIDE = sys::ImGuiTableColumnFlags_NoHide as i32;
+        const NO_HIDE = sys::ImGuiTableColumnFlags_NoHide;
         /// Disable clipping for this column (all [NO_CLIP] columns will render in a same
         /// draw command).
-        const NO_CLIP = sys::ImGuiTableColumnFlags_NoClip as i32;
+        const NO_CLIP = sys::ImGuiTableColumnFlags_NoClip;
         /// Disable ability to sort on this field (even if [ImGuiTableFlags::Sortable] is
         /// set on the table).
-        const NO_SORT = sys::ImGuiTableColumnFlags_NoSort as i32;
+        const NO_SORT = sys::ImGuiTableColumnFlags_NoSort;
         /// Disable ability to sort in the ascending direction.
-        const NO_SORT_ASCENDING = sys::ImGuiTableColumnFlags_NoSortAscending as i32;
+        const NO_SORT_ASCENDING = sys::ImGuiTableColumnFlags_NoSortAscending;
         /// Disable ability to sort in the descending direction.
-        const NO_SORT_DESCENDING = sys::ImGuiTableColumnFlags_NoSortDescending as i32;
+        const NO_SORT_DESCENDING = sys::ImGuiTableColumnFlags_NoSortDescending;
         /// Disable header text width contribution to automatic column width.
-        const NO_HEADER_WIDTH = sys::ImGuiTableColumnFlags_NoHeaderWidth as i32;
+        const NO_HEADER_WIDTH = sys::ImGuiTableColumnFlags_NoHeaderWidth;
         /// Make the initial sort direction Ascending when first sorting on this column (default).
-        const PREFER_SORT_ASCENDING = sys::ImGuiTableColumnFlags_PreferSortAscending as i32;
+        const PREFER_SORT_ASCENDING = sys::ImGuiTableColumnFlags_PreferSortAscending;
         /// Make the initial sort direction Descending when first sorting on this column.
-        const PREFER_SORT_DESCENDING = sys::ImGuiTableColumnFlags_PreferSortDescending as i32;
+        const PREFER_SORT_DESCENDING = sys::ImGuiTableColumnFlags_PreferSortDescending;
         /// Use current Indent value when entering cell (default for column 0).
-        const INDENT_ENABLE = sys::ImGuiTableColumnFlags_IndentEnable as i32;
+        const INDENT_ENABLE = sys::ImGuiTableColumnFlags_IndentEnable;
         /// Ignore current Indent value when entering cell (default for columns > 0).
         /// Indentation changes _within_ the cell will still be honored.
-        const INDENT_DISABLE = sys::ImGuiTableColumnFlags_IndentDisable as i32;
+        const INDENT_DISABLE = sys::ImGuiTableColumnFlags_IndentDisable;
 
         // Output status flags, read-only via [table_get_column_flags]
 
         /// Status: is enabled == not hidden by user/api (referred to as "Hide" in
         /// [DefaultHide] and [NoHide]) flags.
-        const IS_ENABLED = sys::ImGuiTableColumnFlags_IsEnabled as i32;
+        const IS_ENABLED = sys::ImGuiTableColumnFlags_IsEnabled;
         /// Status: is visible == is enabled AND not clipped by scrolling.
-        const IS_VISIBLE = sys::ImGuiTableColumnFlags_IsVisible as i32;
+        const IS_VISIBLE = sys::ImGuiTableColumnFlags_IsVisible;
         /// Status: is currently part of the sort specs
-        const IS_SORTED = sys::ImGuiTableColumnFlags_IsSorted as i32;
+        const IS_SORTED = sys::ImGuiTableColumnFlags_IsSorted;
         /// Status: is hovered by mouse
-        const IS_HOVERED = sys::ImGuiTableColumnFlags_IsHovered as i32;
+        const IS_HOVERED = sys::ImGuiTableColumnFlags_IsHovered;
     }
 }
 
@@ -235,11 +235,11 @@ bitflags! {
     pub struct TableBgTarget: i32 {
         /// Set row background color 0 (generally used for background, automatically set when
         /// [TableFlags::RowBg] is used)
-        const ROW_BG0 = sys::ImGuiTableBgTarget_RowBg0 as i32;
+        const ROW_BG0 = sys::ImGuiTableBgTarget_RowBg0;
         /// Set row background color 1 (generally used for selection marking)
-        const ROW_BG1 = sys::ImGuiTableBgTarget_RowBg1 as i32;
+        const ROW_BG1 = sys::ImGuiTableBgTarget_RowBg1;
         /// Set cell background color (top-most color)
-        const CELL_BG = sys::ImGuiTableBgTarget_CellBg as i32;
+        const CELL_BG = sys::ImGuiTableBgTarget_CellBg;
     }
 }
 
@@ -310,7 +310,7 @@ impl Ui {
             sys::igBeginTable(
                 self.scratch_txt(str_id),
                 column as i32,
-                flags.bits() as i32,
+                flags.bits(),
                 outer_size.into(),
                 inner_width,
             )
@@ -403,7 +403,7 @@ impl Ui {
     #[inline]
     pub fn table_next_row_with_height(&self, flags: TableRowFlags, min_row_height: f32) {
         unsafe {
-            sys::igTableNextRow(flags.bits() as i32, min_row_height);
+            sys::igTableNextRow(flags.bits(), min_row_height);
         }
     }
 
@@ -538,7 +538,7 @@ impl Ui {
         unsafe {
             sys::igTableSetupColumn(
                 self.scratch_txt(data.name),
-                data.flags.bits() as i32,
+                data.flags.bits(),
                 data.init_width_or_weight,
                 data.user_id.0,
             )
@@ -666,8 +666,7 @@ impl Ui {
     /// Gets the flags on the current column in the current table.
     pub fn table_column_flags(&self) -> TableColumnFlags {
         unsafe {
-            TableColumnFlags::from_bits(sys::igTableGetColumnFlags(-1))
-                .expect("bad column flags")
+            TableColumnFlags::from_bits(sys::igTableGetColumnFlags(-1)).expect("bad column flags")
         }
     }
 
@@ -688,7 +687,7 @@ impl Ui {
     /// for arbitrary indices.
     pub fn table_set_bg_color(&self, target: TableBgTarget, color: impl Into<ImColor32>) {
         unsafe {
-            sys::igTableSetBgColor(target.bits() as i32, color.into().into(), -1);
+            sys::igTableSetBgColor(target.bits(), color.into().into(), -1);
         }
     }
 
@@ -703,11 +702,7 @@ impl Ui {
         column_index: usize,
     ) {
         unsafe {
-            sys::igTableSetBgColor(
-                target.bits() as i32,
-                color.into().into(),
-                column_index as i32,
-            );
+            sys::igTableSetBgColor(target.bits(), color.into().into(), column_index as i32);
         }
     }
 

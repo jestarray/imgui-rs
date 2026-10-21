@@ -585,8 +585,15 @@ impl Context {
     }
 }
 
-#[cfg(feature = "docking")]
 impl Context {
+    /// Iterate managed textures, including during renderer shutdown.
+    pub fn textures(&mut self) -> crate::TextureIterator<'_> {
+        unsafe {
+            let io = crate::ig_get_platform_io();
+            crate::TextureIterator::new(std::ptr::addr_of!((*io).Textures))
+        }
+    }
+
     /// Returns an immutable reference to the Context's [`PlatformIo`](crate::PlatformIo) object.
     pub fn platform_io(&self) -> &crate::PlatformIo {
         unsafe {
@@ -603,7 +610,10 @@ impl Context {
             &mut *(crate::ig_get_platform_io() as *mut crate::PlatformIo)
         }
     }
+}
 
+#[cfg(feature = "docking")]
+impl Context {
     /// Returns an immutable reference to the main [`Viewport`](crate::Viewport)
     pub fn main_viewport(&self) -> &crate::Viewport {
         unsafe {

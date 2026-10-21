@@ -86,6 +86,7 @@
 //#![deny(missing_docs)]
 
 pub extern crate imgui_sys as sys;
+pub use crate::render::callbacks::{RendererCallback, RendererCallbacks};
 
 use std::cell;
 use std::os::raw::c_char;
@@ -101,6 +102,7 @@ pub use self::fonts::atlas::*;
 pub use self::fonts::font::*;
 pub use self::fonts::glyph::*;
 pub use self::fonts::glyph_ranges::*;
+pub use self::fonts::FontBaked;
 pub use self::input::keyboard::*;
 pub use self::input::mouse::*;
 pub use self::input_widget::*;
@@ -113,6 +115,9 @@ pub use self::plotlines::PlotLines;
 pub use self::popups::*;
 pub use self::render::draw_data::*;
 pub use self::render::renderer::*;
+pub use self::render::texture::{
+    TextureData, TextureFormat, TextureIterator, TextureRect, TextureStatus,
+};
 pub use self::stacks::*;
 pub use self::string::*;
 pub use self::style::*;

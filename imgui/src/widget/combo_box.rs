@@ -35,19 +35,19 @@ bitflags!(
 #[repr(transparent)]
 pub struct ComboBoxFlags: i32 {
     /// Align the popup toward the left by default
-    const POPUP_ALIGN_LEFT = sys::ImGuiComboFlags_PopupAlignLeft as i32;
+    const POPUP_ALIGN_LEFT = sys::ImGuiComboFlags_PopupAlignLeft;
     /// Max ~4 items visible.
-    const HEIGHT_SMALL = sys::ImGuiComboFlags_HeightSmall as i32;
+    const HEIGHT_SMALL = sys::ImGuiComboFlags_HeightSmall;
     /// Max ~8 items visible (default)
-    const HEIGHT_REGULAR = sys::ImGuiComboFlags_HeightRegular as i32;
+    const HEIGHT_REGULAR = sys::ImGuiComboFlags_HeightRegular;
     /// Max ~20 items visible
-    const HEIGHT_LARGE = sys::ImGuiComboFlags_HeightLarge as i32;
+    const HEIGHT_LARGE = sys::ImGuiComboFlags_HeightLarge;
     /// As many fitting items as possible
-    const HEIGHT_LARGEST = sys::ImGuiComboFlags_HeightLargest as i32;
+    const HEIGHT_LARGEST = sys::ImGuiComboFlags_HeightLargest;
     /// Display on the preview box without the square arrow button
-    const NO_ARROW_BUTTON = sys::ImGuiComboFlags_NoArrowButton as i32;
+    const NO_ARROW_BUTTON = sys::ImGuiComboFlags_NoArrowButton;
     /// Display only a square arrow button
-    const NO_PREVIEW = sys::ImGuiComboFlags_NoPreview as i32;
+    const NO_PREVIEW = sys::ImGuiComboFlags_NoPreview;
 }
 );
 
@@ -149,7 +149,7 @@ impl<'ui, T: AsRef<str>, Preview: AsRef<str>> ComboBox<'ui, T, Preview> {
     pub fn begin(self) -> Option<ComboBoxToken<'ui>> {
         let should_render = unsafe {
             let (ptr_one, ptr_two) = self.ui.scratch_txt_with_opt(self.label, self.preview_value);
-            sys::igBeginCombo(ptr_one, ptr_two, self.flags.bits() as i32)
+            sys::igBeginCombo(ptr_one, ptr_two, self.flags.bits())
         };
         if should_render {
             Some(ComboBoxToken::new(self.ui))

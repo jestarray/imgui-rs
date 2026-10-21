@@ -3,12 +3,18 @@ use crate::internal::RawCast;
 use crate::Ui;
 
 pub mod atlas;
+mod baked;
 pub mod font;
 pub mod glyph;
 pub mod glyph_ranges;
+pub use baked::FontBaked;
 
 /// # Fonts
 impl Ui {
+    /// Borrow the current frame's baked font. Glyphs returned by this view are copies.
+    pub fn current_font_baked(&self) -> FontBaked<'_> {
+        FontBaked::current(self)
+    }
     /// Returns the current font
     #[doc(alias = "GetFont")]
     pub fn current_font(&self) -> &Font {

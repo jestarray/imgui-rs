@@ -13,47 +13,47 @@ bitflags!(
     #[repr(C)]
     pub struct InputTextFlags: i32 {
         /// Allow 0123456789.+-*/
-        const CHARS_DECIMAL = sys::ImGuiInputTextFlags_CharsDecimal as i32;
+        const CHARS_DECIMAL = sys::ImGuiInputTextFlags_CharsDecimal;
         /// Allow 0123456789ABCDEFabcdef
-        const CHARS_HEXADECIMAL = sys::ImGuiInputTextFlags_CharsHexadecimal as i32;
+        const CHARS_HEXADECIMAL = sys::ImGuiInputTextFlags_CharsHexadecimal;
         /// Turn a..z into A..Z
-        const CHARS_UPPERCASE = sys::ImGuiInputTextFlags_CharsUppercase as i32;
+        const CHARS_UPPERCASE = sys::ImGuiInputTextFlags_CharsUppercase;
         /// Filter out spaces, tabs
-        const CHARS_NO_BLANK = sys::ImGuiInputTextFlags_CharsNoBlank as i32;
+        const CHARS_NO_BLANK = sys::ImGuiInputTextFlags_CharsNoBlank;
         /// Select entire text when first taking mouse focus
-        const AUTO_SELECT_ALL = sys::ImGuiInputTextFlags_AutoSelectAll as i32;
+        const AUTO_SELECT_ALL = sys::ImGuiInputTextFlags_AutoSelectAll;
         /// Return 'true' when Enter is pressed (as opposed to when the value was modified)
-        const ENTER_RETURNS_TRUE = sys::ImGuiInputTextFlags_EnterReturnsTrue as i32;
+        const ENTER_RETURNS_TRUE = sys::ImGuiInputTextFlags_EnterReturnsTrue;
         /// Call user function on pressing TAB (for completion handling)
-        const CALLBACK_COMPLETION = sys::ImGuiInputTextFlags_CallbackCompletion as i32;
+        const CALLBACK_COMPLETION = sys::ImGuiInputTextFlags_CallbackCompletion;
         /// Call user function on pressing Up/Down arrows (for history handling)
-        const CALLBACK_HISTORY = sys::ImGuiInputTextFlags_CallbackHistory as i32;
+        const CALLBACK_HISTORY = sys::ImGuiInputTextFlags_CallbackHistory;
         /// Callback on any edit (note that InputText() already returns true on edit, the callback
         /// is useful mainly to manipulate the underlying buffer while focus is active)
-        const CALLBACK_EDIT = sys::ImGuiInputTextFlags_CallbackEdit as i32;
+        const CALLBACK_EDIT = sys::ImGuiInputTextFlags_CallbackEdit;
         /// Call user function every time. User code may query cursor position, modify text buffer.
-        const CALLBACK_ALWAYS = sys::ImGuiInputTextFlags_CallbackAlways as i32;
+        const CALLBACK_ALWAYS = sys::ImGuiInputTextFlags_CallbackAlways;
         /// Call user function to filter character.
-        const CALLBACK_CHAR_FILTER = sys::ImGuiInputTextFlags_CallbackCharFilter as i32;
+        const CALLBACK_CHAR_FILTER = sys::ImGuiInputTextFlags_CallbackCharFilter;
         /// Pressing TAB input a '\t' character into the text field
-        const ALLOW_TAB_INPUT = sys::ImGuiInputTextFlags_AllowTabInput as i32;
+        const ALLOW_TAB_INPUT = sys::ImGuiInputTextFlags_AllowTabInput;
         /// In multi-line mode, unfocus with Enter, add new line with Ctrl+Enter (default is
         /// opposite: unfocus with Ctrl+Enter, add line with Enter).
-        const CTRL_ENTER_FOR_NEW_LINE = sys::ImGuiInputTextFlags_CtrlEnterForNewLine as i32;
+        const CTRL_ENTER_FOR_NEW_LINE = sys::ImGuiInputTextFlags_CtrlEnterForNewLine;
         /// Disable following the cursor horizontally
-        const NO_HORIZONTAL_SCROLL = sys::ImGuiInputTextFlags_NoHorizontalScroll as i32;
+        const NO_HORIZONTAL_SCROLL = sys::ImGuiInputTextFlags_NoHorizontalScroll;
         /// Always overwrite (aka "insert mode").
-        const ALWAYS_OVERWRITE = sys::ImGuiInputTextFlags_AlwaysOverwrite as i32;
+        const ALWAYS_OVERWRITE = sys::ImGuiInputTextFlags_AlwaysOverwrite;
         /// Read-only mode
-        const READ_ONLY = sys::ImGuiInputTextFlags_ReadOnly as i32;
+        const READ_ONLY = sys::ImGuiInputTextFlags_ReadOnly;
         /// Password mode, display all characters as '*'
-        const PASSWORD = sys::ImGuiInputTextFlags_Password as i32;
+        const PASSWORD = sys::ImGuiInputTextFlags_Password;
         /// Disable undo/redo.
-        const NO_UNDO_REDO = sys::ImGuiInputTextFlags_NoUndoRedo as i32;
+        const NO_UNDO_REDO = sys::ImGuiInputTextFlags_NoUndoRedo;
         /// Allow 0123456789.+-*/eE (Scientific notation input)
-        const CHARS_SCIENTIFIC = sys::ImGuiInputTextFlags_CharsScientific as i32;
+        const CHARS_SCIENTIFIC = sys::ImGuiInputTextFlags_CharsScientific;
         /// Allow buffer capacity resize + notify when the string wants to be resized
-        const CALLBACK_RESIZE = sys::ImGuiInputTextFlags_CallbackResize as i32;
+        const CALLBACK_RESIZE = sys::ImGuiInputTextFlags_CallbackResize;
     }
 );
 
@@ -306,7 +306,7 @@ where
                     hint,
                     ptr as *mut core::ffi::c_char,
                     capacity,
-                    self.flags.bits() as i32,
+                    self.flags.bits(),
                     Some(callback::<T>),
                     data,
                 )
@@ -317,7 +317,7 @@ where
                     label,
                     ptr as *mut core::ffi::c_char,
                     capacity,
-                    self.flags.bits() as i32,
+                    self.flags.bits(),
                     Some(callback::<T>),
                     data,
                 )
@@ -464,7 +464,7 @@ impl<'ui, 'p, T: InputTextCallbackHandler, L: AsRef<str>> InputTextMultiline<'ui
                 ptr as *mut core::ffi::c_char,
                 capacity,
                 self.size.into(),
-                self.flags.bits() as i32,
+                self.flags.bits(),
                 Some(callback::<T>),
                 data,
             )
@@ -527,7 +527,7 @@ impl<'ui, 'p, L: AsRef<str>> InputInt<'ui, 'p, L> {
                 self.value as *mut i32,
                 self.step,
                 self.step_fast,
-                self.flags.bits() as i32,
+                self.flags.bits(),
             )
         }
     }
@@ -588,7 +588,7 @@ impl<'ui, 'p, L: AsRef<str>> InputFloat<'ui, 'p, L> {
                 self.step,
                 self.step_fast,
                 two,
-                self.flags.bits() as i32,
+                self.flags.bits(),
             )
         }
     }
@@ -786,7 +786,7 @@ impl<'ui, 'p, L: AsRef<str>, T: DataTypeKind, F: AsRef<str>> InputScalar<'ui, 'p
                     .map(|step| step as *const T)
                     .unwrap_or(ptr::null()) as *const c_void,
                 two,
-                self.flags.bits() as i32,
+                self.flags.bits(),
             )
         }
     }
@@ -873,7 +873,7 @@ impl<'ui, 'p, L: AsRef<str>, T: DataTypeKind, F: AsRef<str>> InputScalarN<'ui, '
                     .map(|step| step as *const T)
                     .unwrap_or(ptr::null()) as *const c_void,
                 two,
-                self.flags.bits() as i32,
+                self.flags.bits(),
             )
         }
     }
@@ -898,16 +898,16 @@ bitflags!(
     /// the general textflags.
     pub struct InputTextCallback: i32 {
         /// Call user function on pressing TAB (for completion handling)
-        const COMPLETION = sys::ImGuiInputTextFlags_CallbackCompletion as i32;
+        const COMPLETION = sys::ImGuiInputTextFlags_CallbackCompletion;
         /// Call user function on pressing Up/Down arrows (for history handling)
-        const HISTORY = sys::ImGuiInputTextFlags_CallbackHistory as i32;
+        const HISTORY = sys::ImGuiInputTextFlags_CallbackHistory;
         /// Call user function every time. User code may query cursor position, modify text buffer.
-        const ALWAYS = sys::ImGuiInputTextFlags_CallbackAlways as i32;
+        const ALWAYS = sys::ImGuiInputTextFlags_CallbackAlways;
         /// Call user function to filter character.
-        const CHAR_FILTER = sys::ImGuiInputTextFlags_CallbackCharFilter as i32;
+        const CHAR_FILTER = sys::ImGuiInputTextFlags_CallbackCharFilter;
         /// Callback on buffer edit (note that InputText already returns true on edit, the
         /// callback is useful mainly to manipulate the underlying buffer while focus is active)
-        const EDIT = sys::ImGuiInputTextFlags_CallbackEdit as i32;
+        const EDIT = sys::ImGuiInputTextFlags_CallbackEdit;
     }
 );
 
@@ -916,14 +916,14 @@ bitflags!(
     /// general textflags.
     pub struct InputTextMultilineCallback: i32 {
         /// Call user function on pressing TAB (for completion handling)
-        const COMPLETION = sys::ImGuiInputTextFlags_CallbackCompletion as i32;
+        const COMPLETION = sys::ImGuiInputTextFlags_CallbackCompletion;
         /// Call user function every time. User code may query cursor position, modify text buffer.
-        const ALWAYS = sys::ImGuiInputTextFlags_CallbackAlways as i32;
+        const ALWAYS = sys::ImGuiInputTextFlags_CallbackAlways;
         /// Call user function to filter character.
-        const CHAR_FILTER = sys::ImGuiInputTextFlags_CallbackCharFilter as i32;
+        const CHAR_FILTER = sys::ImGuiInputTextFlags_CallbackCharFilter;
         /// Callback on buffer edit (note that InputText already returns true on edit, the
         /// callback is useful mainly to manipulate the underlying buffer while focus is active)
-        const EDIT = sys::ImGuiInputTextFlags_CallbackEdit as i32;
+        const EDIT = sys::ImGuiInputTextFlags_CallbackEdit;
     }
 );
 
@@ -1209,13 +1209,13 @@ extern "C" fn callback<T: InputTextCallbackHandler>(
     data: *mut sys::ImGuiInputTextCallbackData,
 ) -> c_int {
     struct CallbackData<'a, T> {
-            event_flag: InputTextFlags,
+        event_flag: InputTextFlags,
         user_data: &'a mut UserData<T>,
     }
 
     let callback_data = unsafe {
         CallbackData {
-            event_flag: InputTextFlags::from_bits((*data).EventFlag as i32).unwrap(),
+            event_flag: InputTextFlags::from_bits((*data).EventFlag).unwrap(),
             user_data: &mut *((*data).UserData as *mut UserData<T>),
         }
     };
@@ -1258,7 +1258,7 @@ extern "C" fn callback<T: InputTextCallbackHandler>(
             }
         }
         InputTextFlags::CALLBACK_CHAR_FILTER => {
-            let chr = unsafe { std::char::from_u32((*data).EventChar as u32).unwrap() };
+            let chr = unsafe { std::char::from_u32((*data).EventChar).unwrap() };
             let new_data = match callback_data.user_data.cback_handler.char_filter(chr) {
                 Some(value) => u32::from(value),
                 // 0 means "do not use this char" in imgui docs
@@ -1266,7 +1266,7 @@ extern "C" fn callback<T: InputTextCallbackHandler>(
             };
             // set the new char...
             unsafe {
-                (*data).EventChar = u32::try_from(new_data).unwrap_or(0);
+                (*data).EventChar = new_data;
             }
         }
         InputTextFlags::CALLBACK_HISTORY => {

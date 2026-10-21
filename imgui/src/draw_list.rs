@@ -23,6 +23,9 @@ use crate::render::renderer::TextureId;
 
 use std::marker::PhantomData;
 
+mod primitives;
+pub use primitives::*;
+
 #[cfg(test)]
 mod tests;
 
@@ -747,7 +750,7 @@ impl<'ui> Rect<'ui> {
                     self.p2.into(),
                     self.color.into(),
                     self.rounding,
-                    self.flags.bits() as i32,
+                    self.flags.bits(),
                 );
             }
         } else {
@@ -759,7 +762,7 @@ impl<'ui> Rect<'ui> {
                     self.color.into(),
                     self.rounding,
                     self.thickness,
-                    self.flags.bits() as i32,
+                    self.flags.bits(),
                 );
             }
         }
@@ -1277,7 +1280,7 @@ impl<'ui> ImageRounded<'ui> {
                 self.uv_max.into(),
                 self.col.into(),
                 self.rounding,
-                self.draw_flags.bits() as i32,
+                self.draw_flags.bits(),
             );
         }
     }
@@ -1323,5 +1326,22 @@ impl<'ui, F: FnOnce() + 'static> Callback<'ui, F> {
         }
         let callback = Box::from_raw(callback as *mut F);
         callback();
+    }
+}
+
+impl crate::DrawListMut<'_> {
+    /// Enqueue a standard renderer operation, returning false if unsupported.
+    ///
+    /// The backend must register its callbacks in platform IO before the frame.
+    /// A Rust backend can handle the command using [`crate::RendererCallbacks::classify`].
+    pub fn add_renderer_callback(&self, callback: crate::RendererCallback) -> bool {
+        unsafe {
+            let io = &*(crate::ig_get_platform_io() as *const crate::PlatformIo);
+            let Some(callback) = io.renderer_callbacks().get(callback) else {
+                return false;
+            };
+            sys::ImDrawList_AddCallback(self.draw_list, Some(callback), std::ptr::null_mut(), 0);
+        }
+        true
     }
 }

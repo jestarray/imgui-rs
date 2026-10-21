@@ -10,45 +10,45 @@ bitflags!(
     #[repr(transparent)]
     pub struct TreeNodeFlags: i32 {
         /// Draw as selected
-        const SELECTED = sys::ImGuiTreeNodeFlags_Selected as i32;
+        const SELECTED = sys::ImGuiTreeNodeFlags_Selected;
         /// Full colored frame (e.g. for CollapsingHeader)
-        const FRAMED = sys::ImGuiTreeNodeFlags_Framed as i32;
+        const FRAMED = sys::ImGuiTreeNodeFlags_Framed;
         /// Hit testing to allow subsequent widgets to overlap this one
-        const ALLOW_OVERLAP = sys::ImGuiTreeNodeFlags_AllowOverlap as i32;
+        const ALLOW_OVERLAP = sys::ImGuiTreeNodeFlags_AllowOverlap;
         /// Don't push a tree node when open (e.g. for CollapsingHeader) = no extra indent nor
         /// pushing on ID stack
-        const NO_TREE_PUSH_ON_OPEN = sys::ImGuiTreeNodeFlags_NoTreePushOnOpen as i32;
+        const NO_TREE_PUSH_ON_OPEN = sys::ImGuiTreeNodeFlags_NoTreePushOnOpen;
         /// Don't automatically and temporarily open node when Logging is active (by default
         /// logging will automatically open tree nodes)
-        const NO_AUTO_OPEN_ON_LOG = sys::ImGuiTreeNodeFlags_NoAutoOpenOnLog as i32;
+        const NO_AUTO_OPEN_ON_LOG = sys::ImGuiTreeNodeFlags_NoAutoOpenOnLog;
         /// Default node to be open
-        const DEFAULT_OPEN = sys::ImGuiTreeNodeFlags_DefaultOpen as i32;
+        const DEFAULT_OPEN = sys::ImGuiTreeNodeFlags_DefaultOpen;
         /// Need double-click to open node
-        const OPEN_ON_DOUBLE_CLICK = sys::ImGuiTreeNodeFlags_OpenOnDoubleClick as i32;
+        const OPEN_ON_DOUBLE_CLICK = sys::ImGuiTreeNodeFlags_OpenOnDoubleClick;
         /// Only open when clicking on the arrow part.
         ///
         /// If `TreeNodeFlags::OPEN_ON_DOUBLE_CLICK` is also set, single-click arrow or
         /// double-click all box to open.
-        const OPEN_ON_ARROW = sys::ImGuiTreeNodeFlags_OpenOnArrow as i32;
+        const OPEN_ON_ARROW = sys::ImGuiTreeNodeFlags_OpenOnArrow;
         /// No collapsing, no arrow (use as a convenience for leaf nodes)
-        const LEAF = sys::ImGuiTreeNodeFlags_Leaf as i32;
+        const LEAF = sys::ImGuiTreeNodeFlags_Leaf;
         /// Display a bullet instead of arrow
-        const BULLET = sys::ImGuiTreeNodeFlags_Bullet as i32;
+        const BULLET = sys::ImGuiTreeNodeFlags_Bullet;
         /// Use `Style::frame_padding` (even for an unframed text node) to vertically align text
         /// baseline to regular widget height.
         ///
         /// Equivalent to calling `Ui::align_text_to_frame_padding`.
-        const FRAME_PADDING = sys::ImGuiTreeNodeFlags_FramePadding as i32;
+        const FRAME_PADDING = sys::ImGuiTreeNodeFlags_FramePadding;
         /// Extend hit box to the right-most edge, even if not framed.
         ///
         /// This is not the default in order to allow adding other items on the same line. In the
         /// future we may refactor the hit system to be front-to-back, allowing natural overlaps
         /// and then this can become the default.
-        const SPAN_AVAIL_WIDTH = sys::ImGuiTreeNodeFlags_SpanAvailWidth as i32;
+        const SPAN_AVAIL_WIDTH = sys::ImGuiTreeNodeFlags_SpanAvailWidth;
         /// Extend hit box to the left-most and right-most edges (bypass the indented area)
-        const SPAN_FULL_WIDTH = sys::ImGuiTreeNodeFlags_SpanFullWidth as i32;
+        const SPAN_FULL_WIDTH = sys::ImGuiTreeNodeFlags_SpanFullWidth;
         /// (WIP) Nav: left direction may move to this tree node from any of its child
-        const NAV_LEFT_JUMPS_TO_PARENT = sys::ImGuiTreeNodeFlags_NavLeftJumpsToParent as i32;
+        const NAV_LEFT_JUMPS_TO_PARENT = sys::ImGuiTreeNodeFlags_NavLeftJumpsToParent;
     }
 );
 
@@ -290,16 +290,16 @@ impl<'a, T: AsRef<str>, L: AsRef<str>> TreeNode<'a, T, L> {
                 TreeNodeId::Str(id) => match self.label {
                     Some(label) => {
                         let (id, label) = self.ui.scratch_txt_two(id, label);
-                        sys::igTreeNodeEx_StrStr(id, self.flags.bits() as i32, fmt_ptr(), label)
+                        sys::igTreeNodeEx_StrStr(id, self.flags.bits(), fmt_ptr(), label)
                     }
                     None => {
                         let id = self.ui.scratch_txt(id);
-                        sys::igTreeNodeEx_Str(id, self.flags.bits() as i32)
+                        sys::igTreeNodeEx_Str(id, self.flags.bits())
                     }
                 },
                 TreeNodeId::Ptr(id) => sys::igTreeNodeEx_Ptr(
                     id,
-                    self.flags.bits() as i32,
+                    self.flags.bits(),
                     fmt_ptr(),
                     match self.label {
                         Some(v) => self.ui.scratch_txt(v),
@@ -470,10 +470,7 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
     #[inline]
     pub fn build(self, ui: &Ui) -> bool {
         unsafe {
-            sys::igCollapsingHeader_TreeNodeFlags(
-                ui.scratch_txt(self.label),
-                self.flags.bits() as i32,
-            )
+            sys::igCollapsingHeader_TreeNodeFlags(ui.scratch_txt(self.label), self.flags.bits())
         }
     }
     /// Builds the collapsing header, and adds an additional close button that changes the value of
@@ -487,7 +484,7 @@ impl<T: AsRef<str>> CollapsingHeader<T> {
             sys::igCollapsingHeader_BoolPtr(
                 ui.scratch_txt(self.label),
                 opened as *mut bool,
-                self.flags.bits() as i32,
+                self.flags.bits(),
             )
         }
     }

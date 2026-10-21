@@ -118,8 +118,10 @@ pub(crate) unsafe extern "C" fn platform_set_window_size(
     size: sys::ImVec2,
 ) {
     PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        ctx.backend
-            .set_window_size(unsafe { &mut *(viewport as *mut Viewport) }, [size.x, size.y]);
+        ctx.backend.set_window_size(
+            unsafe { &mut *(viewport as *mut Viewport) },
+            [size.x, size.y],
+        );
     })
 }
 pub(crate) unsafe extern "C" fn platform_get_window_size(
@@ -144,18 +146,18 @@ pub(crate) unsafe extern "C" fn platform_set_window_focus(viewport: *mut sys::Im
 pub(crate) unsafe extern "C" fn platform_get_window_focus(
     viewport: *mut sys::ImGuiViewport,
 ) -> bool {
-    PLATFORM_VIEWPORT_CONTEXT
-        .with_borrow_mut(|ctx| ctx.backend.get_window_focus(unsafe {
-            &mut *(viewport as *mut Viewport)
-        }))
+    PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
+        ctx.backend
+            .get_window_focus(unsafe { &mut *(viewport as *mut Viewport) })
+    })
 }
 pub(crate) unsafe extern "C" fn platform_get_window_minimized(
     viewport: *mut sys::ImGuiViewport,
 ) -> bool {
-    PLATFORM_VIEWPORT_CONTEXT
-        .with_borrow_mut(|ctx| ctx.backend.get_window_minimized(unsafe {
-            &mut *(viewport as *mut Viewport)
-        }))
+    PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
+        ctx.backend
+            .get_window_minimized(unsafe { &mut *(viewport as *mut Viewport) })
+    })
 }
 pub(crate) unsafe extern "C" fn platform_set_window_title(
     viewport: *mut sys::ImGuiViewport,
@@ -207,10 +209,11 @@ pub(crate) unsafe extern "C" fn platform_create_vk_surface(
     out_surface: *mut u64,
 ) -> c_int {
     PLATFORM_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        ctx.backend
-            .create_vk_surface(unsafe { &mut *(viewport as *mut Viewport) }, instance, unsafe {
-                &mut *out_surface
-            })
+        ctx.backend.create_vk_surface(
+            unsafe { &mut *(viewport as *mut Viewport) },
+            instance,
+            unsafe { &mut *out_surface },
+        )
     })
 }
 
@@ -331,8 +334,10 @@ pub(crate) unsafe extern "C" fn renderer_set_window_size(
     size: sys::ImVec2,
 ) {
     RENDERER_VIEWPORT_CONTEXT.with_borrow_mut(|ctx| {
-        ctx.backend
-            .set_window_size(unsafe { &mut *(viewport as *mut Viewport) }, [size.x, size.y]);
+        ctx.backend.set_window_size(
+            unsafe { &mut *(viewport as *mut Viewport) },
+            [size.x, size.y],
+        );
     })
 }
 pub(crate) unsafe extern "C" fn renderer_render_window(

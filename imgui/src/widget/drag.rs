@@ -84,7 +84,7 @@ impl<L: AsRef<str>, T: DataTypeKind, F: AsRef<str>> Drag<T, L, F> {
                     .map(|max| max as *const T)
                     .unwrap_or(ptr::null()) as *const c_void,
                 two,
-                self.flags.bits() as i32,
+                self.flags.bits(),
             )
         }
     }
@@ -110,7 +110,7 @@ impl<L: AsRef<str>, T: DataTypeKind, F: AsRef<str>> Drag<T, L, F> {
                     .map(|max| max as *const T)
                     .unwrap_or(ptr::null()) as *const c_void,
                 two,
-                self.flags.bits() as i32,
+                self.flags.bits(),
             )
         }
     }
@@ -235,7 +235,7 @@ where
                 self.max.unwrap_or(0.0),
                 display_format,
                 max_display_format,
-                self.flags.bits() as i32,
+                self.flags.bits(),
             )
         }
     }
@@ -278,7 +278,7 @@ where
                 self.max.unwrap_or(0),
                 display_format,
                 max_display_format,
-                self.flags.bits() as i32,
+                self.flags.bits(),
             )
         }
     }

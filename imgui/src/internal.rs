@@ -13,11 +13,19 @@ pub struct ImVector<T> {
 impl<T> ImVector<T> {
     #[inline]
     pub fn as_slice(&self) -> &[T] {
+        if self.size == 0 {
+            return &[];
+        }
+        assert!(self.size > 0 && !self.data.is_null(), "invalid ImVector");
         unsafe { slice::from_raw_parts(self.data, self.size as usize) }
     }
 
     #[inline]
     pub fn as_slice_mut(&mut self) -> &mut [T] {
+        if self.size == 0 {
+            return &mut [];
+        }
+        assert!(self.size > 0 && !self.data.is_null(), "invalid ImVector");
         unsafe { slice::from_raw_parts_mut(self.data, self.size as usize) }
     }
 
@@ -131,16 +139,16 @@ pub unsafe trait RawCast<T>: Sized {
 #[repr(i32)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum DataType {
-    I8 = sys::ImGuiDataType_S8 as i32,
-    U8 = sys::ImGuiDataType_U8 as i32,
-    I16 = sys::ImGuiDataType_S16 as i32,
-    U16 = sys::ImGuiDataType_U16 as i32,
-    I32 = sys::ImGuiDataType_S32 as i32,
-    U32 = sys::ImGuiDataType_U32 as i32,
-    I64 = sys::ImGuiDataType_S64 as i32,
-    U64 = sys::ImGuiDataType_U64 as i32,
-    F32 = sys::ImGuiDataType_Float as i32,
-    F64 = sys::ImGuiDataType_Double as i32,
+    I8 = sys::ImGuiDataType_S8,
+    U8 = sys::ImGuiDataType_U8,
+    I16 = sys::ImGuiDataType_S16,
+    U16 = sys::ImGuiDataType_U16,
+    I32 = sys::ImGuiDataType_S32,
+    U32 = sys::ImGuiDataType_U32,
+    I64 = sys::ImGuiDataType_S64,
+    U64 = sys::ImGuiDataType_U64,
+    F32 = sys::ImGuiDataType_Float,
+    F64 = sys::ImGuiDataType_Double,
 }
 
 /// Primitive type marker.

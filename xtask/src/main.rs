@@ -34,11 +34,10 @@ fn try_main() -> Result<()> {
 }
 
 fn lint_all() -> Result<()> {
-    // Lint with only default, only docking, and only freetype, and everything
-    xshell::cmd!("cargo clippy --workspace --all-targets").run()?;
-    xshell::cmd!("cargo clippy --workspace --all-targets --features docking").run()?;
-    xshell::cmd!("cargo clippy --workspace --all-targets --features freetype").run()?;
-    xshell::cmd!("cargo clippy --workspace --all-targets --features docking,freetype").run()?;
+    for features in native_features() {
+        xshell::cmd!("cargo clippy --workspace --all-targets --features {features} -- -D warnings")
+            .run()?;
+    }
 
     // Check formatting
     xshell::cmd!("cargo fmt --all -- --check").run()?;
@@ -46,11 +45,10 @@ fn lint_all() -> Result<()> {
 }
 
 fn test_all() -> Result<()> {
-    // Test with default/docking/freetype features
-    xshell::cmd!("cargo test --workspace --all-targets").run()?;
-    xshell::cmd!("cargo test --workspace --all-targets --features docking").run()?;
-    xshell::cmd!("cargo test --workspace --all-targets --features freetype").run()?;
-    xshell::cmd!("cargo test --workspace --all-targets --features docking,freetype").run()?;
+    for features in native_features() {
+        xshell::cmd!("cargo test --workspace --all-targets --features {features}").run()?;
+        xshell::cmd!("cargo test --workspace --doc --features {features}").run()?;
+    }
 
     // WASM imports are checked without trying to link a native test executable.
     xshell::cmd!("cargo check -p imgui --target wasm32-unknown-unknown --features wasm").run()?;
@@ -63,12 +61,23 @@ fn test_all() -> Result<()> {
     )
     .run()?;
 
-    // Test doc examples
-    xshell::cmd!("cargo test --workspace --doc").run()?;
-
     // Run heavy tests in release mode
     xshell::cmd!("cargo test -p imgui --release -- --ignored").run()?;
     Ok(())
+}
+
+fn native_features() -> [String; 4] {
+    let freetype = if cfg!(windows) {
+        "freetype,imgui-sys/use-vcpkg"
+    } else {
+        "freetype"
+    };
+    [
+        String::new(),
+        "docking,tables-api".into(),
+        freetype.into(),
+        format!("docking,tables-api,{freetype}"),
+    ]
 }
 
 static VERBOSE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);

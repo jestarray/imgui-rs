@@ -43,7 +43,7 @@ impl Bindgen {
                 generate_binding_file(&header, &output.join(&output_name), &types, &funcs, None)?;
                 generate_binding_file(
                     &header,
-                    &output.join(format!("wasm_{}", &output_name)),
+                    &output.join(format!("wasm_{}", output_name)),
                     &types,
                     &funcs,
                     Some(&wasm_name),
@@ -91,13 +91,13 @@ fn get_definitions(definitions: &Path) -> Result<Vec<String>> {
     for (name, def) in definitions {
         let defs = def
             .into_array()
-            .ok_or_else(|| anyhow!("def {} not an array", &name))?;
+            .ok_or_else(|| anyhow!("def {} not an array", name))?;
         keep_defs.reserve(defs.len());
         for func in defs {
             let args = func["argsT"].as_array().unwrap();
             if !args
                 .iter()
-                .any(|a| a["type"].as_str().map_or(false, bad_arg_type))
+                .any(|a| a["type"].as_str().is_some_and(bad_arg_type))
             {
                 let name = func["ov_cimguiname"]
                     .as_str()
@@ -132,7 +132,11 @@ fn generate_binding_file(
         .impl_debug(true)
         .use_core()
         .blocklist_type("__darwin_size_t")
-        .raw_line("#![allow(nonstandard_style, clippy::all)]")
+        // bindgen 0.72's bitfields use transmutes for signed integers. Keep its
+        // MSRV-compatible output; newer rustc versions prefer from_ne_bytes.
+        .raw_line(
+            "#![allow(unknown_lints, nonstandard_style, clippy::all, unnecessary_transmutes)]",
+        )
         .clang_arg("-DCIMGUI_DEFINE_ENUMS_AND_STRUCTS=1")
         // Match defines from imgui-sys/build.rs DEFINES array
         .clang_arg("-DIMGUI_DISABLE_OBSOLETE_FUNCTIONS")
@@ -175,6 +179,10 @@ fn patch_bindings(output: &Path) -> Result<()> {
         "ImGuiSelectionExternalStorage",
         "ImDrawCmd",
         "ImGuiPlatformIO",
+        "ImGuiNextWindowData",
+        "ImGuiSettingsHandler",
+        "ImGuiContext",
+        "ImGuiContextHook",
     ];
     for name in structs {
         changed |= patch_struct(&mut lines, name)?;
@@ -188,11 +196,17 @@ fn patch_bindings(output: &Path) -> Result<()> {
 }
 
 fn patch_struct(lines: &mut Vec<String>, name: &str) -> Result<bool> {
-    let struct_index = match lines.iter().position(|line| line.contains(&format!("pub struct {name}"))) {
+    let struct_index = match lines
+        .iter()
+        .position(|line| line == &format!("pub struct {name} {{"))
+    {
         Some(index) => index,
         None => return Ok(false),
     };
-    if lines.iter().any(|line| line.starts_with(&format!("impl PartialEq for {name}"))) {
+    if lines
+        .iter()
+        .any(|line| line.starts_with(&format!("impl PartialEq for {name}")))
+    {
         return Ok(false);
     }
 
@@ -327,7 +341,10 @@ fn build_impl_block(
             }
         } else {
             eq_checks.push(format!("self.{0} == other.{0}", field.name));
-            hash_lines.push(format!("::core::hash::Hash::hash(&self.{0}, state);", field.name));
+            hash_lines.push(format!(
+                "::core::hash::Hash::hash(&self.{0}, state);",
+                field.name
+            ));
         }
     }
 
@@ -362,7 +379,10 @@ fn build_impl_block(
         if eq_checks.is_empty() {
             partial_eq.push_str("        true\n");
         } else {
-            partial_eq.push_str(&format!("        {}\n", eq_checks.join("\n            && ")));
+            partial_eq.push_str(&format!(
+                "        {}\n",
+                eq_checks.join("\n            && ")
+            ));
         }
         partial_eq.push_str("    }\n}\n");
         blocks.push(partial_eq);
@@ -416,11 +436,22 @@ fn build_impl_block(
 }
 
 fn is_fn_ptr_type(ty: &str) -> bool {
-    ty.contains("extern \"C\" fn") || ty == "ImDrawCallback"
+    ty.contains("extern \"C\" fn") || is_callback_alias(ty)
 }
 
 fn is_fn_ptr_option_type(ty: &str) -> bool {
-    ty.contains("Option<") || ty == "ImDrawCallback"
+    ty.contains("Option<") || is_callback_alias(ty)
+}
+
+fn is_callback_alias(ty: &str) -> bool {
+    matches!(
+        ty,
+        "ImDrawCallback"
+            | "ImGuiSizeCallback"
+            | "ImGuiDemoMarkerCallback"
+            | "ImGuiErrorCallback"
+            | "ImGuiContextHookCallback"
+    )
 }
 
 fn parse_derive_traits(line: &str) -> Vec<String> {
@@ -452,5 +483,32 @@ fn filter_derives(line: &str, remove: &[&str]) -> String {
         format!("{}{}{}", prefix, filtered.join(", "), suffix)
     } else {
         line.to_string()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::patch_struct;
+
+    #[test]
+    fn callback_patch_matches_exact_struct_and_is_idempotent() {
+        let mut lines: Vec<_> = r#"#[derive(Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiContextHook {
+    pub Callback: ImGuiContextHookCallback,
+}
+#[derive(Copy, Clone, PartialEq)]
+pub struct ImGuiContext {
+    pub ErrorCallback: ImGuiErrorCallback,
+}
+"#
+        .lines()
+        .map(str::to_owned)
+        .collect();
+        assert!(patch_struct(&mut lines, "ImGuiContext").unwrap());
+        assert!(patch_struct(&mut lines, "ImGuiContextHook").unwrap());
+        assert!(!patch_struct(&mut lines, "ImGuiContext").unwrap());
+        let output = lines.join("\n");
+        assert!(output.contains("fn_opt_eq!(self.ErrorCallback, other.ErrorCallback)"));
+        assert!(output.contains("fn_opt_hash!(self.Callback, state)"));
     }
 }

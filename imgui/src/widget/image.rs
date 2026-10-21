@@ -62,8 +62,7 @@ impl Image {
             let size = self.size.into();
             let uv0 = self.uv0.into();
             let uv1 = self.uv1.into();
-            if self.tint_col != [1.0, 1.0, 1.0, 1.0] || self.border_col != [0.0, 0.0, 0.0, 0.0]
-            {
+            if self.tint_col != [1.0, 1.0, 1.0, 1.0] || self.border_col != [0.0, 0.0, 0.0, 0.0] {
                 sys::igImageWithBg(
                     tex_ref,
                     size,
@@ -228,7 +227,7 @@ impl ImageButtonDeprecated {
 
             if self.frame_padding >= 0 {
                 sys::igPushStyleVar_Vec2(
-                    sys::ImGuiStyleVar_FramePadding as i32,
+                    sys::ImGuiStyleVar_FramePadding,
                     [self.frame_padding as f32, self.frame_padding as f32].into(),
                 );
             }

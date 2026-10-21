@@ -9,15 +9,15 @@ bitflags!(
     #[repr(transparent)]
     pub struct SelectableFlags: i32 {
         /// Clicking this don't close parent popup window
-        const NO_AUTO_CLOSE_POPUPS = sys::ImGuiSelectableFlags_NoAutoClosePopups as i32;
+        const NO_AUTO_CLOSE_POPUPS = sys::ImGuiSelectableFlags_NoAutoClosePopups;
         /// Selectable frame can span all columns (text will still fit in current column)
-        const SPAN_ALL_COLUMNS = sys::ImGuiSelectableFlags_SpanAllColumns as i32;
+        const SPAN_ALL_COLUMNS = sys::ImGuiSelectableFlags_SpanAllColumns;
         /// Generate press events on double clicks too
-        const ALLOW_DOUBLE_CLICK = sys::ImGuiSelectableFlags_AllowDoubleClick as i32;
+        const ALLOW_DOUBLE_CLICK = sys::ImGuiSelectableFlags_AllowDoubleClick;
         /// Cannot be selected, display greyed out text
-        const DISABLED = sys::ImGuiSelectableFlags_Disabled as i32;
+        const DISABLED = sys::ImGuiSelectableFlags_Disabled;
         /// Hit testing to allow subsequent willdgets to overlap this one
-        const ALLOW_OVERLAP = sys::ImGuiSelectableFlags_AllowOverlap as i32;
+        const ALLOW_OVERLAP = sys::ImGuiSelectableFlags_AllowOverlap;
     }
 );
 
@@ -137,7 +137,7 @@ impl<'ui, T: AsRef<str>> Selectable<'ui, T> {
             sys::igSelectable_Bool(
                 self.ui.scratch_txt(self.label),
                 self.selected,
-                self.flags.bits() as i32,
+                self.flags.bits(),
                 self.size.into(),
             )
         }

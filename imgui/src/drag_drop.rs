@@ -38,35 +38,35 @@ bitflags!(
         /// By default, a successful call to igBeginDragDropSource opens a tooltip so you can
         /// display a preview or description of the source contents. This flag disable this
         /// behavior.
-        const SOURCE_NO_PREVIEW_TOOLTIP = sys::ImGuiDragDropFlags_SourceNoPreviewTooltip as i32;
+        const SOURCE_NO_PREVIEW_TOOLTIP = sys::ImGuiDragDropFlags_SourceNoPreviewTooltip;
         /// By default, when dragging we clear data so that igIsItemHovered() will return false, to
         /// avoid subsequent user code submitting tooltips. This flag disable this behavior so you
         /// can still call igIsItemHovered() on the source item.
-        const SOURCE_NO_DISABLE_HOVER = sys::ImGuiDragDropFlags_SourceNoDisableHover as i32;
+        const SOURCE_NO_DISABLE_HOVER = sys::ImGuiDragDropFlags_SourceNoDisableHover;
         /// Disable the behavior that allows to open tree nodes and collapsing header by holding
         /// over them while dragging a source item.
-        const SOURCE_NO_HOLD_TO_OPEN_OTHERS = sys::ImGuiDragDropFlags_SourceNoHoldToOpenOthers as i32;
+        const SOURCE_NO_HOLD_TO_OPEN_OTHERS = sys::ImGuiDragDropFlags_SourceNoHoldToOpenOthers;
         /// Allow items such as igText(), igImage() that have no unique identifier to be used as
         /// drag source, by manufacturing a temporary identifier based on their window-relative
         /// position. This is extremely unusual within the dear imgui ecosystem and so we made it
         /// explicit.
-        const SOURCE_ALLOW_NULL_ID = sys::ImGuiDragDropFlags_SourceAllowNullID as i32;
+        const SOURCE_ALLOW_NULL_ID = sys::ImGuiDragDropFlags_SourceAllowNullID;
         /// External source (from outside of imgui), won't attempt to read current item/window
         /// info. Will always return true. Only one Extern source can be active simultaneously.
-        const SOURCE_EXTERN = sys::ImGuiDragDropFlags_SourceExtern as i32;
+        const SOURCE_EXTERN = sys::ImGuiDragDropFlags_SourceExtern;
         /// Automatically expire the payload if the source ceases to be submitted (otherwise
         /// payloads are persisting while being dragged)
-        const PAYLOAD_AUTO_EXPIRE = sys::ImGuiDragDropFlags_PayloadAutoExpire as i32;
+        const PAYLOAD_AUTO_EXPIRE = sys::ImGuiDragDropFlags_PayloadAutoExpire;
         /// igAcceptDragDropPayload() will returns true even before the mouse button is released.
         /// You can then call igIsDelivery() to test if the payload needs to be delivered.
-        const ACCEPT_BEFORE_DELIVERY = sys::ImGuiDragDropFlags_AcceptBeforeDelivery as i32;
+        const ACCEPT_BEFORE_DELIVERY = sys::ImGuiDragDropFlags_AcceptBeforeDelivery;
         /// Do not draw the default highlight rectangle when hovering over target.
-        const ACCEPT_NO_DRAW_DEFAULT_RECT = sys::ImGuiDragDropFlags_AcceptNoDrawDefaultRect as i32;
+        const ACCEPT_NO_DRAW_DEFAULT_RECT = sys::ImGuiDragDropFlags_AcceptNoDrawDefaultRect;
         /// Request hiding the igBeginDragDropSource tooltip from the igBeginDragDropTarget site.
-        const ACCEPT_NO_PREVIEW_TOOLTIP = sys::ImGuiDragDropFlags_AcceptNoPreviewTooltip as i32;
+        const ACCEPT_NO_PREVIEW_TOOLTIP = sys::ImGuiDragDropFlags_AcceptNoPreviewTooltip;
         /// For peeking ahead and inspecting the payload before delivery. This is just a convenience
         /// flag for the intersection of `ACCEPT_BEFORE_DELIVERY` and `ACCEPT_NO_DRAW_DEFAULT_RECT`
-        const ACCEPT_PEEK_ONLY = sys::ImGuiDragDropFlags_AcceptPeekOnly as i32;
+        const ACCEPT_PEEK_ONLY = sys::ImGuiDragDropFlags_AcceptPeekOnly;
     }
 );
 
@@ -280,7 +280,7 @@ impl<'ui, T: AsRef<str>> DragDropSource<'ui, T> {
         ptr: *const ffi::c_void,
         size: usize,
     ) -> Option<DragDropSourceToolTip<'ui>> {
-        let should_begin = sys::igBeginDragDropSource(self.flags.bits() as i32);
+        let should_begin = sys::igBeginDragDropSource(self.flags.bits());
 
         if should_begin {
             sys::igSetDragDropPayload(self.ui.scratch_txt(&self.name), ptr, size, self.cond as i32);
@@ -456,7 +456,7 @@ impl<'ui> DragDropTarget<'ui> {
         name: impl AsRef<str>,
         flags: DragDropFlags,
     ) -> Option<DragDropPayload> {
-        let inner = sys::igAcceptDragDropPayload(self.0.scratch_txt(name), flags.bits() as i32);
+        let inner = sys::igAcceptDragDropPayload(self.0.scratch_txt(name), flags.bits());
         if inner.is_null() {
             None
         } else {

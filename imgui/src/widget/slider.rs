@@ -13,13 +13,13 @@ bitflags!(
         /// Clamp value to min/max bounds when input manually with CTRL+Click.
         ///
         /// By default CTRL+click allows going out of bounds.
-        const ALWAYS_CLAMP = sys::ImGuiSliderFlags_AlwaysClamp as i32;
+        const ALWAYS_CLAMP = sys::ImGuiSliderFlags_AlwaysClamp;
         /// Make the widget logarithmic instead of linear
-        const LOGARITHMIC = sys::ImGuiSliderFlags_Logarithmic as i32;
+        const LOGARITHMIC = sys::ImGuiSliderFlags_Logarithmic;
         /// Disable rounding underlying value to match precision of the display format string
-        const NO_ROUND_TO_FORMAT = sys::ImGuiSliderFlags_NoRoundToFormat as i32;
+        const NO_ROUND_TO_FORMAT = sys::ImGuiSliderFlags_NoRoundToFormat;
         /// Disable CTRL+Click or Enter key allowing to input text directly into the widget
-        const NO_INPUT = sys::ImGuiSliderFlags_NoInput as i32;
+        const NO_INPUT = sys::ImGuiSliderFlags_NoInput;
     }
 );
 
@@ -149,7 +149,7 @@ where
                 &self.min as *const Data as *const c_void,
                 &self.max as *const Data as *const c_void,
                 display_format,
-                self.flags.bits() as i32,
+                self.flags.bits(),
             )
         }
     }
@@ -170,7 +170,7 @@ where
                 &self.min as *const Data as *const c_void,
                 &self.max as *const Data as *const c_void,
                 display_format,
-                self.flags.bits() as i32,
+                self.flags.bits(),
             )
         }
     }
@@ -276,7 +276,7 @@ where
                 &self.min as *const Data as *const c_void,
                 &self.max as *const Data as *const c_void,
                 display_format,
-                self.flags.bits() as i32,
+                self.flags.bits(),
             )
         }
     }
@@ -377,7 +377,7 @@ where
                 self.min_degrees,
                 self.max_degrees,
                 display_format,
-                self.flags.bits() as i32,
+                self.flags.bits(),
             )
         }
     }

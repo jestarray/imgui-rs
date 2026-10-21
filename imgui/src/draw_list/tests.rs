@@ -67,13 +67,119 @@ fn primitives_emit_geometry() {
                 )
                 .thickness(3.0)
                 .flags(flags));
+            emitted!(draw
+                .add_line_h(10.0, 90.0, 120.0, white)
+                .thickness(3.0)
+                .flags(flags));
+            emitted!(draw
+                .add_line_v(100.0, 110.0, 180.0, white)
+                .flags(DrawFlags::STROKE_INSIDE));
+            for filled in [false, true] {
+                emitted!(draw
+                    .add_quad(
+                        [120.0, 120.0],
+                        [180.0, 120.0],
+                        [190.0, 160.0],
+                        [110.0, 160.0],
+                        white
+                    )
+                    .filled(filled)
+                    .thickness(2.0)
+                    .flags(flags));
+                emitted!(draw
+                    .add_ngon([240.0, 140.0], 20.0, 5, white)
+                    .filled(filled)
+                    .thickness(2.0)
+                    .flags(flags));
+                emitted!(draw
+                    .add_ellipse([320.0, 140.0], [35.0, 20.0], white)
+                    .rotation(0.4)
+                    .num_segments(24)
+                    .filled(filled)
+                    .thickness(2.0)
+                    .flags(flags));
+            }
+            emitted!(draw
+                .add_bezier_quadratic([350.0, 120.0], [410.0, 180.0], [450.0, 120.0], white)
+                .num_segments(16)
+                .thickness(2.0)
+                .flags(flags));
             assert!(count > 0);
+            draw.add_concave_poly_filled(
+                [
+                    [10.0, 200.0],
+                    [60.0, 200.0],
+                    [40.0, 220.0],
+                    [60.0, 240.0],
+                    [10.0, 240.0],
+                ],
+                white,
+            );
+            assert!(unsafe { (*draw.draw_list).VtxBuffer.Size } > count);
         }
         ui.show_demo_window(&mut true);
         let data = ctx.render();
         assert!(data.total_vtx_count > 0 && data.total_idx_count > 0);
         assert_eq!(data.framebuffer_scale, [scale, scale]);
     }
+}
+
+#[test]
+fn independent_paths_and_cleanup() {
+    let (_guard, mut ctx) = crate::test::test_ctx_initialized();
+    let ui = ctx.frame();
+    let draw = ui.get_background_draw_list();
+    let a = draw.path().line_to([10.0, 10.0]).line_to([20.0, 20.0]);
+    let b = draw
+        .path()
+        .rect([30.0, 30.0], [60.0, 60.0], 4.0, DrawFlags::ROUND_ALL);
+    assert_eq!(unsafe { (*draw.draw_list)._Path.Size }, 0);
+    b.fill_convex(ImColor32::WHITE, DrawFlags::empty());
+    let before = unsafe { (*draw.draw_list).VtxBuffer.Size };
+    a.stroke(ImColor32::WHITE, 2.0, DrawFlags::empty());
+    assert!(unsafe { (*draw.draw_list).VtxBuffer.Size } > before);
+    draw.path()
+        .line_to([70.0, 70.0])
+        .line_to_merge_duplicate([70.0, 70.0])
+        .arc_to([90.0, 90.0], 20.0, 0.0, 1.0, 0)
+        .arc_to_fast([110.0, 110.0], 10.0, 0, 6)
+        .elliptical_arc_to([140.0, 140.0], [20.0, 10.0], 0.4, 0.0, 1.0, 12)
+        .bezier_cubic_to([150.0, 150.0], [160.0, 170.0], [170.0, 170.0], 0)
+        .bezier_quadratic_to([180.0, 180.0], [190.0, 170.0], 8)
+        .stroke(ImColor32::WHITE, 2.0, DrawFlags::CLOSED);
+    draw.path()
+        .line_to([10.0, 200.0])
+        .line_to([60.0, 200.0])
+        .line_to([40.0, 220.0])
+        .line_to([60.0, 240.0])
+        .line_to([10.0, 240.0])
+        .fill_concave(ImColor32::WHITE);
+    struct BadColor;
+    impl From<BadColor> for ImColor32 {
+        fn from(_: BadColor) -> Self {
+            panic!("color conversion");
+        }
+    }
+    assert!(catch_unwind(AssertUnwindSafe(|| draw
+        .path()
+        .line_to([0.0, 0.0])
+        .line_to([10.0, 10.0])
+        .stroke(BadColor, 1.0, DrawFlags::empty())))
+    .is_err());
+    assert_eq!(unsafe { (*draw.draw_list)._Path.Size }, 0);
+    assert!(catch_unwind(AssertUnwindSafe(|| draw.add_ngon(
+        [0.0, 0.0],
+        10.0,
+        2,
+        ImColor32::WHITE
+    )))
+    .is_err());
+    assert!(catch_unwind(AssertUnwindSafe(|| draw.add_ellipse(
+        [0.0, 0.0],
+        [-1.0, 2.0],
+        ImColor32::WHITE
+    )))
+    .is_err());
 }
 
 #[test]

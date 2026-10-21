@@ -1,5 +1,4 @@
 use crate::fonts::atlas::FontId;
-use crate::internal::RawCast;
 use crate::math::MintVec4;
 use crate::style::{StyleColor, StyleVar};
 use crate::sys;
@@ -34,9 +33,35 @@ impl Ui {
     pub fn push_font(&self, id: FontId) -> FontStackToken<'_> {
         let fonts = self.fonts();
         let font = fonts
-            .get_font(id)
+            .font_ptr(id)
             .expect("Font atlas did not contain the given font");
-        unsafe { sys::igPushFont(font.raw() as *const _ as *mut _, font.legacy_size) };
+        unsafe { sys::igPushFont(font, (*font).LegacySize) };
+        FontStackToken::new(self)
+    }
+
+    /// Select a font at an explicit size in logical pixels. A size of zero
+    /// preserves the current size. Dynamic sizes need a renderer supporting textures.
+    #[doc(alias = "PushFont")]
+    pub fn push_font_with_size(&self, id: FontId, size: f32) -> FontStackToken<'_> {
+        assert!(
+            size.is_finite() && size >= 0.0,
+            "font size must be finite and nonnegative"
+        );
+        let font = self
+            .fonts()
+            .font_ptr(id)
+            .expect("Font atlas did not contain the given font");
+        unsafe { sys::igPushFont(font, size) };
+        FontStackToken::new(self)
+    }
+
+    /// Select a size for the current font. Zero preserves the current size.
+    pub fn push_font_size(&self, size: f32) -> FontStackToken<'_> {
+        assert!(
+            size.is_finite() && size >= 0.0,
+            "font size must be finite and nonnegative"
+        );
+        unsafe { sys::igPushFont(std::ptr::null_mut(), size) };
         FontStackToken::new(self)
     }
     /// Changes a style color by pushing a change to the color stack.
@@ -139,40 +164,32 @@ unsafe fn push_style_var(style_var: StyleVar) {
     use crate::style::StyleVar::*;
     use crate::sys::{igPushStyleVar_Float, igPushStyleVar_Vec2};
     match style_var {
-        Alpha(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_Alpha as i32, v),
-        WindowPadding(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_WindowPadding as i32, v.into()),
-        WindowRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_WindowRounding as i32, v),
-        WindowBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_WindowBorderSize as i32, v),
-        WindowMinSize(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_WindowMinSize as i32, v.into()),
-        WindowTitleAlign(v) => {
-            igPushStyleVar_Vec2(sys::ImGuiStyleVar_WindowTitleAlign as i32, v.into())
-        }
-        ChildRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_ChildRounding as i32, v),
-        ChildBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_ChildBorderSize as i32, v),
-        PopupRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_PopupRounding as i32, v),
-        PopupBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_PopupBorderSize as i32, v),
-        FramePadding(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_FramePadding as i32, v.into()),
-        FrameRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_FrameRounding as i32, v),
-        FrameBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_FrameBorderSize as i32, v),
-        ItemSpacing(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_ItemSpacing as i32, v.into()),
-        ItemInnerSpacing(v) => {
-            igPushStyleVar_Vec2(sys::ImGuiStyleVar_ItemInnerSpacing as i32, v.into())
-        }
-        IndentSpacing(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_IndentSpacing as i32, v),
-        ScrollbarSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_ScrollbarSize as i32, v),
-        ScrollbarRounding(v) => {
-            igPushStyleVar_Float(sys::ImGuiStyleVar_ScrollbarRounding as i32, v)
-        }
-        GrabMinSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_GrabMinSize as i32, v),
-        GrabRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_GrabRounding as i32, v),
-        TabRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_TabRounding as i32, v),
-        ButtonTextAlign(v) => {
-            igPushStyleVar_Vec2(sys::ImGuiStyleVar_ButtonTextAlign as i32, v.into())
-        }
+        Alpha(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_Alpha, v),
+        WindowPadding(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_WindowPadding, v.into()),
+        WindowRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_WindowRounding, v),
+        WindowBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_WindowBorderSize, v),
+        WindowMinSize(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_WindowMinSize, v.into()),
+        WindowTitleAlign(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_WindowTitleAlign, v.into()),
+        ChildRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_ChildRounding, v),
+        ChildBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_ChildBorderSize, v),
+        PopupRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_PopupRounding, v),
+        PopupBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_PopupBorderSize, v),
+        FramePadding(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_FramePadding, v.into()),
+        FrameRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_FrameRounding, v),
+        FrameBorderSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_FrameBorderSize, v),
+        ItemSpacing(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_ItemSpacing, v.into()),
+        ItemInnerSpacing(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_ItemInnerSpacing, v.into()),
+        IndentSpacing(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_IndentSpacing, v),
+        ScrollbarSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_ScrollbarSize, v),
+        ScrollbarRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_ScrollbarRounding, v),
+        GrabMinSize(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_GrabMinSize, v),
+        GrabRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_GrabRounding, v),
+        TabRounding(v) => igPushStyleVar_Float(sys::ImGuiStyleVar_TabRounding, v),
+        ButtonTextAlign(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_ButtonTextAlign, v.into()),
         SelectableTextAlign(v) => {
-            igPushStyleVar_Vec2(sys::ImGuiStyleVar_SelectableTextAlign as i32, v.into())
+            igPushStyleVar_Vec2(sys::ImGuiStyleVar_SelectableTextAlign, v.into())
         }
-        CellPadding(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_CellPadding as i32, v.into()),
+        CellPadding(v) => igPushStyleVar_Vec2(sys::ImGuiStyleVar_CellPadding, v.into()),
     }
 }
 
@@ -269,7 +286,7 @@ impl Ui {
     /// Returns a `ItemFlagsStackToken` that may be popped by calling `.pop()` or dropping it.
     pub fn push_item_flag(&self, item_flag: ItemFlag, enabled: bool) -> ItemFlagsStackToken<'_> {
         unsafe {
-            sys::igPushItemFlag(item_flag.bits() as i32, enabled);
+            sys::igPushItemFlag(item_flag.bits(), enabled);
         }
 
         ItemFlagsStackToken::new(self)
@@ -455,31 +472,31 @@ bitflags::bitflags! {
     /// A temporary change in item flags, used in [`Ui::push_item_flag`].
     pub struct ItemFlag: i32 {
         /// Disable keyboard tabbing. This is a "lighter" version of [`ItemFlag::NO_NAV`].
-        const NO_TAB_STOP = sys::ImGuiItemFlags_NoTabStop as i32;
+        const NO_TAB_STOP = sys::ImGuiItemFlags_NoTabStop;
         /// Disable any form of focusing (keyboard/gamepad directional navigation and
         /// [`Ui::set_keyboard_focus_here`] calls).
-        const NO_NAV = sys::ImGuiItemFlags_NoNav as i32;
+        const NO_NAV = sys::ImGuiItemFlags_NoNav;
         /// Disable item being a candidate for default focus (e.g. used by title bar items).
-        const NO_NAV_DEFAULT_FOCUS = sys::ImGuiItemFlags_NoNavDefaultFocus as i32;
+        const NO_NAV_DEFAULT_FOCUS = sys::ImGuiItemFlags_NoNavDefaultFocus;
         /// Any button-like behavior will have repeat mode enabled (based on [`Io::key_repeat_delay`](crate::Io::key_repeat_delay)
         /// and [`Io::key_repeat_rate`](crate::Io::key_repeat_rate) values).
         /// Note that you can also call [`Ui::is_item_active`] after any button to tell if it is being held.
-        const BUTTON_REPEAT = sys::ImGuiItemFlags_ButtonRepeat as i32;
+        const BUTTON_REPEAT = sys::ImGuiItemFlags_ButtonRepeat;
         /// [`Ui::menu_item`]/[`Ui::selectable`] automatically close their parent popup window.
-        const AUTO_CLOSE_POPUPS = sys::ImGuiItemFlags_AutoClosePopups as i32;
+        const AUTO_CLOSE_POPUPS = sys::ImGuiItemFlags_AutoClosePopups;
         /// Allow submitting an item with the same identifier as an item already submitted this frame without triggering
         /// a warning tooltip if [`Io::config_debug_highlight_id_conflicts`](crate::Io::config_debug_highlight_id_conflicts) is set.
-        const ALLOW_DUPLICATE_ID = sys::ImGuiItemFlags_AllowDuplicateId as i32;
+        const ALLOW_DUPLICATE_ID = sys::ImGuiItemFlags_AllowDuplicateId;
         /// Apply text input edits while typing, rather than on validation.
-        const LIVE_EDIT_ON_INPUT_TEXT = sys::ImGuiItemFlags_LiveEditOnInputText as i32;
+        const LIVE_EDIT_ON_INPUT_TEXT = sys::ImGuiItemFlags_LiveEditOnInputText;
         /// Apply scalar input edits while typing, rather than on validation.
-        const LIVE_EDIT_ON_INPUT_SCALAR = sys::ImGuiItemFlags_LiveEditOnInputScalar as i32;
+        const LIVE_EDIT_ON_INPUT_SCALAR = sys::ImGuiItemFlags_LiveEditOnInputScalar;
         /// Enable live editing for both text and scalar inputs.
-        const LIVE_EDIT_ON_INPUT = sys::ImGuiItemFlags_LiveEditOnInput as i32;
+        const LIVE_EDIT_ON_INPUT = sys::ImGuiItemFlags_LiveEditOnInput;
         /// Display a mixed/indeterminate value in supported widgets.
         ///
         /// Disable live editing for mixed-value text input to avoid applying undo
         /// operations to every selected object.
-        const MIXED_VALUE = sys::ImGuiItemFlags_MixedValue as i32;
+        const MIXED_VALUE = sys::ImGuiItemFlags_MixedValue;
     }
 }

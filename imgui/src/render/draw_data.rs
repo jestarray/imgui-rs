@@ -41,6 +41,12 @@ pub struct DrawData {
 unsafe impl RawCast<sys::ImDrawData> for DrawData {}
 
 impl DrawData {
+    /// Iterate managed texture requests before consuming drawing commands.
+    /// Acknowledge successful uploads with `mark_created` / `mark_updated`.
+    pub fn textures(&self) -> crate::TextureIterator<'_> {
+        unsafe { crate::TextureIterator::new(self.textures) }
+    }
+
     /// Returns an iterator over the draw lists included in the draw data.
     #[inline]
     pub fn draw_lists(&self) -> DrawListIterator<'_> {
@@ -317,10 +323,12 @@ fn test_drawvert_memory_layout() {
 
 /// A container for a heap-allocated deep copy of a `DrawData` struct.
 ///
-/// Can be used to retain draw data for rendering on a different thread.
+/// Retains geometry, CPU texture pixels and pending update rectangles independently
+/// of the source context. Upload acknowledgements affect only this snapshot.
 /// The underlying copy is released when this struct is dropped.
 pub struct OwnedDrawData {
     draw_data: *mut sys::ImDrawData,
+    _textures: Option<super::texture::OwnedTextures>,
 }
 
 impl OwnedDrawData {
@@ -343,6 +351,7 @@ impl Default for OwnedDrawData {
     fn default() -> Self {
         Self {
             draw_data: std::ptr::null_mut(),
+            _textures: None,
         }
     }
 }
@@ -351,6 +360,7 @@ impl From<&DrawData> for OwnedDrawData {
     /// Construct `OwnedDrawData` from `DrawData` by creating a heap-allocated deep copy of the given `DrawData`
     fn from(value: &DrawData) -> Self {
         use std::mem::size_of;
+        let mut textures = unsafe { super::texture::OwnedTextures::copy(value.textures) };
         OwnedDrawData {
             draw_data: unsafe {
                 let other_ptr = value.raw();
@@ -363,26 +373,44 @@ impl From<&DrawData> for OwnedDrawData {
                 (*result).DisplaySize = other_ptr.DisplaySize;
                 (*result).FramebufferScale = other_ptr.FramebufferScale;
                 (*result).OwnerViewport = other_ptr.OwnerViewport;
-                (*result).Textures = other_ptr.Textures;
+                (*result).Textures = if other_ptr.Textures.is_null() {
+                    std::ptr::null_mut()
+                } else {
+                    &mut *textures.list
+                };
 
                 // Manually allocate and populate CmdLists ImVector
                 let list_count = other_ptr.CmdLists.Size as usize;
                 if list_count > 0 {
-                    (*result).CmdLists.Data = sys::igMemAlloc(
-                        size_of::<*mut sys::ImDrawList>() * list_count,
-                    ) as *mut *mut sys::ImDrawList;
+                    (*result).CmdLists.Data =
+                        sys::igMemAlloc(size_of::<*mut sys::ImDrawList>() * list_count)
+                            as *mut *mut sys::ImDrawList;
                     (*result).CmdLists.Size = list_count as i32;
                     (*result).CmdLists.Capacity = list_count as i32;
 
                     for i in 0..list_count {
                         let original_list = *other_ptr.CmdLists.Data.add(i);
                         let cloned_list = sys::ImDrawList_CloneOutput(original_list);
+                        for i in 0..(*cloned_list).CmdBuffer.Size as usize {
+                            let command = &mut *(*cloned_list).CmdBuffer.Data.add(i);
+                            if !command.TexRef._TexData.is_null() {
+                                if let Some(&replacement) =
+                                    textures.remap.get(&(command.TexRef._TexData as usize))
+                                {
+                                    command.TexRef._TexData = replacement;
+                                } else {
+                                    command.TexRef._TexID = (*command.TexRef._TexData).TexID;
+                                    command.TexRef._TexData = std::ptr::null_mut();
+                                }
+                            }
+                        }
                         *(*result).CmdLists.Data.add(i) = cloned_list;
                     }
                 }
 
                 result
             },
+            _textures: Some(textures),
         }
     }
 }

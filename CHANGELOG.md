@@ -27,6 +27,19 @@
 
 ### Added
 
+- Added builders for horizontal/vertical lines, quads, n-gons, ellipses and
+  quadratic Béziers, concave polygon filling, and independently buffered paths.
+- Added explicit font sizing, frame-borrowed baked-font queries with copied
+  glyphs, vector/bitmap default fonts, validated remapping, font removal/cache
+  compaction, and `FontConfig::extra_size_scale`.
+- Added frame-borrowed renderer texture requests and upload acknowledgements,
+  standard renderer callback classification/enqueuing, and platform IO access
+  without the docking feature. Owned draw-data snapshots now copy textures too.
+- `TextureId` now stores a full `u64` on every target; `id()` returns `u64`.
+  `Textures` reserves identifier zero for unuploaded managed textures.
+- Updated xtask's Windows FreeType selection and table/doc coverage, enabled
+  formatting/lint checks on pull requests, and cleaned up current Clippy warnings.
+
 - Added `CheckboxSelectedBg` style color
 
 ### Changed

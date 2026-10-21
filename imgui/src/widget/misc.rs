@@ -10,11 +10,11 @@ bitflags!(
     #[repr(transparent)]
     pub struct ButtonFlags: i32 {
         /// React on left mouse button
-        const MOUSE_BUTTON_LEFT = sys::ImGuiButtonFlags_MouseButtonLeft as i32;
+        const MOUSE_BUTTON_LEFT = sys::ImGuiButtonFlags_MouseButtonLeft;
         /// React on right mouse button
-        const MOUSE_BUTTON_RIGHT = sys::ImGuiButtonFlags_MouseButtonRight as i32;
+        const MOUSE_BUTTON_RIGHT = sys::ImGuiButtonFlags_MouseButtonRight;
         /// React on middle mouse button
-        const MOUSE_BUTTON_MIDDLE = sys::ImGuiButtonFlags_MouseButtonMiddle as i32;
+        const MOUSE_BUTTON_MIDDLE = sys::ImGuiButtonFlags_MouseButtonMiddle;
     }
 );
 
@@ -66,13 +66,7 @@ impl Ui {
         size: impl Into<MintVec2>,
         flags: ButtonFlags,
     ) -> bool {
-        unsafe {
-            sys::igInvisibleButton(
-                self.scratch_txt(id),
-                size.into().into(),
-                flags.bits() as i32,
-            )
-        }
+        unsafe { sys::igInvisibleButton(self.scratch_txt(id), size.into().into(), flags.bits()) }
     }
     /// Renders a square button with an arrow shape.
     ///

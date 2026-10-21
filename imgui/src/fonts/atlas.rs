@@ -14,13 +14,13 @@ bitflags! {
     #[repr(transparent)]
     pub struct FontAtlasFlags: i32 {
         /// Don't round the height to next power of two
-        const NO_POWER_OF_TWO_HEIGHT = sys::ImFontAtlasFlags_NoPowerOfTwoHeight as i32;
+        const NO_POWER_OF_TWO_HEIGHT = sys::ImFontAtlasFlags_NoPowerOfTwoHeight;
         /// Don't build software mouse cursors into the atlas
-        const NO_MOUSE_CURSORS = sys::ImFontAtlasFlags_NoMouseCursors as i32;
+        const NO_MOUSE_CURSORS = sys::ImFontAtlasFlags_NoMouseCursors;
         /// Do not bake line textures. This disables anti-aliased lines and line endings.
-        const NO_BAKED_LINES = sys::ImFontAtlasFlags_NoBakedLines as i32;
+        const NO_BAKED_LINES = sys::ImFontAtlasFlags_NoBakedLines;
         /// Do not bake rounded-corner textures; use tessellation instead.
-        const NO_BAKED_ROUND_CORNERS = sys::ImFontAtlasFlags_NoBakedRoundCorners as i32;
+        const NO_BAKED_ROUND_CORNERS = sys::ImFontAtlasFlags_NoBakedRoundCorners;
     }
 }
 
@@ -76,6 +76,14 @@ pub struct FontAtlas {
 unsafe impl RawCast<sys::ImFontAtlas> for FontAtlas {}
 
 impl FontAtlas {
+    pub(crate) fn font_ptr(&self, id: FontId) -> Option<*mut sys::ImFont> {
+        self.fonts
+            .as_slice()
+            .iter()
+            .copied()
+            .find(|&font| font.cast_const() == id.0)
+            .map(|font| font.cast())
+    }
     #[doc(alias = "AddFontDefault", alias = "AddFont")]
     pub fn add_font(&mut self, font_sources: &[FontSource<'_>]) -> FontId {
         let (head, tail) = font_sources.split_first().unwrap();
@@ -94,6 +102,18 @@ impl FontAtlas {
                     config.apply_to_raw_config(&mut raw_config, self.raw_mut());
                 }
                 sys::ImFontAtlas_AddFontDefault(self.raw_mut(), &raw_config)
+            },
+            FontSource::DefaultFontVector { config } => unsafe {
+                if let Some(config) = config {
+                    config.apply_to_raw_config(&mut raw_config, self.raw_mut());
+                }
+                sys::ImFontAtlas_AddFontDefaultVector(self.raw_mut(), &raw_config)
+            },
+            FontSource::DefaultFontBitmap { config } => unsafe {
+                if let Some(config) = config {
+                    config.apply_to_raw_config(&mut raw_config, self.raw_mut());
+                }
+                sys::ImFontAtlas_AddFontDefaultBitmap(self.raw_mut(), &raw_config)
             },
             FontSource::TtfData {
                 data,
@@ -141,6 +161,100 @@ impl FontAtlas {
         }
         None
     }
+    /// Read a font's debug name as an owned string.
+    pub fn font_debug_name(&self, id: FontId) -> Option<String> {
+        let font = self.font_ptr(id)?;
+        let name = unsafe { sys::ImFont_GetDebugName(font) };
+        if name.is_null() {
+            None
+        } else {
+            Some(
+                unsafe { std::ffi::CStr::from_ptr(name) }
+                    .to_string_lossy()
+                    .into_owned(),
+            )
+        }
+    }
+    /// Test whether one of this font's sources contains the codepoint.
+    pub fn font_contains_glyph(&self, id: FontId, codepoint: char) -> bool {
+        self.font_ptr(id)
+            .is_some_and(|font| unsafe { sys::ImFont_IsGlyphInFont(font, codepoint as u32) })
+    }
+    /// Map a codepoint to another codepoint. Apply remappings before the glyph is baked.
+    /// Returns false if the font does not belong to this atlas.
+    pub fn remap_codepoint(&mut self, id: FontId, from: char, to: char) -> bool {
+        let Some(font) = self.font_ptr(id) else {
+            return false;
+        };
+        unsafe { sys::ImFont_AddRemapCodepoint(font, from as u32, to as u32) };
+        true
+    }
+    /// Map a codepoint to a glyph index in one of the font's sources.
+    /// Returns false for unknown fonts/sources/formats, index zero, or an index
+    /// outside the source's glyph count. Glyph indices use upstream's 16-bit
+    /// representation. Apply remappings before the glyph is baked.
+    pub fn remap_codepoint_to_glyph_index(
+        &mut self,
+        id: FontId,
+        from: char,
+        source: u8,
+        glyph_index: u16,
+    ) -> bool {
+        let Some(font) = self.font_ptr(id) else {
+            return false;
+        };
+        // stb_truetype's horizontal-metrics lookup does not range-check indices.
+        // Validate the source's SFNT maxp table before handing an index to it.
+        let Some(count) = self.font_glyph_count(id, source) else {
+            return false;
+        };
+        if glyph_index == 0 || glyph_index >= count {
+            return false;
+        }
+        unsafe {
+            sys::ImFont_AddRemapCodepointToGlyphIndex(
+                font,
+                from as u32,
+                source.into(),
+                glyph_index.into(),
+            )
+        };
+        true
+    }
+    /// Number of glyphs in a TrueType/OpenType source, or None for an unknown source/format.
+    pub fn font_glyph_count(&self, id: FontId, source: u8) -> Option<u16> {
+        let font = self.font_ptr(id)?;
+        unsafe {
+            let sources = &(*font).Sources;
+            if i32::from(source) >= sources.Size {
+                return None;
+            }
+            let source = &**sources.Data.add(usize::from(source));
+            if source.FontData.is_null() || source.FontDataSize <= 0 {
+                return None;
+            }
+            let data =
+                slice::from_raw_parts(source.FontData.cast::<u8>(), source.FontDataSize as usize);
+            sfnt_glyph_count(data, usize::try_from(source.FontNo).ok()?)
+        }
+    }
+    /// Remove a font owned by this atlas. Existing FontIds for it become invalid.
+    pub fn remove_font(&mut self, id: FontId) -> bool {
+        assert!(!self.locked, "font atlas is locked during this frame");
+        let Some(font) = self.font_ptr(id) else {
+            return false;
+        };
+        unsafe { sys::ImFontAtlas_RemoveFont(self.raw_mut(), font) };
+        true
+    }
+    /// Compact cached font/texture storage outside a locked frame.
+    pub fn compact_cache(&mut self) {
+        assert!(!self.locked, "font atlas is locked during this frame");
+        if !self.tex_is_built || self.tex_data.is_null() {
+            return;
+        }
+        unsafe { sys::ImFontAtlas_CompactCache(self.raw_mut()) };
+    }
     /// Returns true if the font atlas has been built
     #[doc(alias = "IsBuilt")]
     pub fn is_built(&self) -> bool {
@@ -172,11 +286,11 @@ impl FontAtlas {
             let needs_build = !(*atlas_ptr).tex_is_built
                 || (*atlas_ptr).tex_data.is_null()
                 || (*(*atlas_ptr).tex_data).Pixels.is_null()
-                || (*(*atlas_ptr).raw_mut()).TexDesiredFormat != format;
+                || (*atlas_ptr).raw_mut().TexDesiredFormat != format;
 
             if needs_build {
                 let raw_atlas = (*atlas_ptr).raw_mut();
-                (*raw_atlas).TexDesiredFormat = format;
+                raw_atlas.TexDesiredFormat = format;
                 // Call ImFontAtlasBuildMain() - the non-obsolete build function
                 // This is what GetTexDataAsFormat() calls internally
                 sys::ImFontAtlas_BuildMain_Wrapper(raw_atlas);
@@ -249,6 +363,50 @@ impl FontAtlas {
     }
 }
 
+fn sfnt_glyph_count(data: &[u8], font_index: usize) -> Option<u16> {
+    fn u16_at(data: &[u8], pos: usize) -> Option<u16> {
+        Some(u16::from_be_bytes(
+            data.get(pos..pos.checked_add(2)?)?.try_into().ok()?,
+        ))
+    }
+    fn u32_at(data: &[u8], pos: usize) -> Option<usize> {
+        usize::try_from(u32::from_be_bytes(
+            data.get(pos..pos.checked_add(4)?)?.try_into().ok()?,
+        ))
+        .ok()
+    }
+    let offset = if data.get(..4)? == b"ttcf" {
+        if font_index >= u32_at(data, 8)? {
+            return None;
+        }
+        u32_at(data, 12usize.checked_add(font_index.checked_mul(4)?)?)?
+    } else {
+        if font_index != 0 {
+            return None;
+        }
+        0
+    };
+    let header = data.get(offset..offset.checked_add(12)?)?;
+    if !matches!(&header[..4], b"\0\x01\0\0" | b"OTTO" | b"true" | b"typ1") {
+        return None;
+    }
+    let table_start = offset.checked_add(12)?;
+    for i in 0..usize::from(u16_at(header, 4)?) {
+        let entry = table_start.checked_add(i.checked_mul(16)?)?;
+        let table = data.get(entry..entry.checked_add(16)?)?;
+        if &table[..4] == b"maxp" {
+            let start = u32_at(table, 8)?;
+            let len = u32_at(table, 12)?;
+            if len < 6 {
+                return None;
+            }
+            let maxp = data.get(start..start.checked_add(len)?)?;
+            return u16_at(maxp, 4);
+        }
+    }
+    None
+}
+
 #[test]
 #[cfg(test)]
 fn test_font_atlas_memory_layout() {
@@ -304,8 +462,12 @@ fn test_font_atlas_memory_layout() {
 /// A source for binary font data
 #[derive(Clone, Debug)]
 pub enum FontSource<'a> {
-    /// Default font included with the library (ProggyClean.ttf)
+    /// Choose the default font using upstream size and display-density heuristics.
     DefaultFontData { config: Option<FontConfig> },
+    /// Explicitly select the embedded scalable default font.
+    DefaultFontVector { config: Option<FontConfig> },
+    /// Explicitly select the embedded bitmap default font.
+    DefaultFontBitmap { config: Option<FontConfig> },
     /// Binary TTF/OTF font data
     TtfData {
         data: &'a [u8],
@@ -348,6 +510,8 @@ pub struct FontConfig {
     /// IMPORTANT: If you increase this it is expected that you increase font scale
     /// accordingly, otherwise quality may look lowered.
     pub rasterizer_density: f32,
+    /// Additional size scaling applied when rasterizing the font.
+    pub extra_size_scale: f32,
     /// Font flags
     pub flags: sys::ImFontFlags,
     /// Explicitly specify the ellipsis character.
@@ -375,10 +539,11 @@ impl Default for FontConfig {
             font_loader_flags: sys_font_config.FontLoaderFlags,
             rasterizer_multiply: sys_font_config.RasterizerMultiply,
             rasterizer_density: sys_font_config.RasterizerDensity,
+            extra_size_scale: sys_font_config.ExtraSizeScale,
             flags: sys_font_config.Flags,
             ellipsis_char: match sys_font_config.EllipsisChar {
                 0 => None,
-                value => std::char::from_u32(value as u32),
+                value => std::char::from_u32(value),
             },
             name: None,
         }
@@ -404,6 +569,7 @@ impl FontConfig {
         raw.FontLoaderFlags = self.font_loader_flags;
         raw.RasterizerMultiply = self.rasterizer_multiply;
         raw.RasterizerDensity = self.rasterizer_density;
+        raw.ExtraSizeScale = self.extra_size_scale;
         raw.Flags = self.flags;
         raw.EllipsisChar = self.ellipsis_char.unwrap_or('\0') as sys::ImWchar;
         if let Some(name) = self.name.as_ref() {

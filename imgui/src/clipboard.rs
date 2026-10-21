@@ -112,7 +112,9 @@ impl Ui {
         current_clipboard_text_fn.and_then(|get_clipboard_text_fn| {
             // Bypass FFI if we end up calling our own function anyway
             if get_clipboard_text_fn as usize
-                == get_clipboard_text as unsafe extern "C" fn(*mut sys::ImGuiContext) -> *const c_char as usize
+                == get_clipboard_text
+                    as unsafe extern "C" fn(*mut sys::ImGuiContext) -> *const c_char
+                    as usize
             {
                 let ctx = unsafe {
                     &mut *((*platform_io).Platform_ClipboardUserData as *mut ClipboardContext)
@@ -147,8 +149,8 @@ impl Ui {
         if let Some(set_clipboard_text_fn) = set_clipboard_text_fn {
             // Bypass FFI if we end up calling our own function anyway
             if set_clipboard_text_fn as usize
-                == set_clipboard_text
-                    as unsafe extern "C" fn(*mut sys::ImGuiContext, *const c_char) as usize
+                == set_clipboard_text as unsafe extern "C" fn(*mut sys::ImGuiContext, *const c_char)
+                    as usize
             {
                 let ctx = unsafe {
                     &mut *((*platform_io).Platform_ClipboardUserData as *mut ClipboardContext)

@@ -25,32 +25,32 @@ use std::ptr;
 bitflags! {
     #[repr(transparent)]
     pub struct TabBarFlags: i32 {
-        const REORDERABLE = sys::ImGuiTabBarFlags_Reorderable as i32;
-        const AUTO_SELECT_NEW_TABS = sys::ImGuiTabBarFlags_AutoSelectNewTabs as i32;
-        const TAB_LIST_POPUP_BUTTON = sys::ImGuiTabBarFlags_TabListPopupButton as i32;
-        const NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON = sys::ImGuiTabBarFlags_NoCloseWithMiddleMouseButton as i32;
-        const NO_TAB_LIST_SCROLLING_BUTTONS = sys::ImGuiTabBarFlags_NoTabListScrollingButtons as i32;
-        const NO_TOOLTIP = sys::ImGuiTabBarFlags_NoTooltip as i32;
-        const DRAW_SELECTED_OVERLINE = sys::ImGuiTabBarFlags_DrawSelectedOverline as i32;
-        const FITTING_POLICY_MIXED = sys::ImGuiTabBarFlags_FittingPolicyMixed as i32;
-        const FITTING_POLICY_SHRINK = sys::ImGuiTabBarFlags_FittingPolicyShrink as i32;
-        const FITTING_POLICY_SCROLL = sys::ImGuiTabBarFlags_FittingPolicyScroll as i32;
-        const FITTING_POLICY_MASK = sys::ImGuiTabBarFlags_FittingPolicyMask_ as i32;
-        const FITTING_POLICY_DEFAULT = sys::ImGuiTabBarFlags_FittingPolicyDefault_ as i32;
+        const REORDERABLE = sys::ImGuiTabBarFlags_Reorderable;
+        const AUTO_SELECT_NEW_TABS = sys::ImGuiTabBarFlags_AutoSelectNewTabs;
+        const TAB_LIST_POPUP_BUTTON = sys::ImGuiTabBarFlags_TabListPopupButton;
+        const NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON = sys::ImGuiTabBarFlags_NoCloseWithMiddleMouseButton;
+        const NO_TAB_LIST_SCROLLING_BUTTONS = sys::ImGuiTabBarFlags_NoTabListScrollingButtons;
+        const NO_TOOLTIP = sys::ImGuiTabBarFlags_NoTooltip;
+        const DRAW_SELECTED_OVERLINE = sys::ImGuiTabBarFlags_DrawSelectedOverline;
+        const FITTING_POLICY_MIXED = sys::ImGuiTabBarFlags_FittingPolicyMixed;
+        const FITTING_POLICY_SHRINK = sys::ImGuiTabBarFlags_FittingPolicyShrink;
+        const FITTING_POLICY_SCROLL = sys::ImGuiTabBarFlags_FittingPolicyScroll;
+        const FITTING_POLICY_MASK = sys::ImGuiTabBarFlags_FittingPolicyMask_;
+        const FITTING_POLICY_DEFAULT = sys::ImGuiTabBarFlags_FittingPolicyDefault_;
     }
 }
 
 bitflags! {
     #[repr(transparent)]
     pub struct TabItemFlags: i32 {
-        const UNSAVED_DOCUMENT = sys::ImGuiTabItemFlags_UnsavedDocument as i32;
-        const SET_SELECTED = sys::ImGuiTabItemFlags_SetSelected as i32;
-        const NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON = sys::ImGuiTabItemFlags_NoCloseWithMiddleMouseButton as i32;
-        const NO_PUSH_ID = sys::ImGuiTabItemFlags_NoPushId as i32;
-        const NO_TOOLTIP = sys::ImGuiTabItemFlags_NoTooltip as i32;
-        const NO_REORDER = sys::ImGuiTabItemFlags_NoReorder as i32;
-        const LEADING = sys::ImGuiTabItemFlags_Leading as i32;
-        const TRAILING = sys::ImGuiTabItemFlags_Trailing as i32;
+        const UNSAVED_DOCUMENT = sys::ImGuiTabItemFlags_UnsavedDocument;
+        const SET_SELECTED = sys::ImGuiTabItemFlags_SetSelected;
+        const NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON = sys::ImGuiTabItemFlags_NoCloseWithMiddleMouseButton;
+        const NO_PUSH_ID = sys::ImGuiTabItemFlags_NoPushId;
+        const NO_TOOLTIP = sys::ImGuiTabItemFlags_NoTooltip;
+        const NO_REORDER = sys::ImGuiTabItemFlags_NoReorder;
+        const LEADING = sys::ImGuiTabItemFlags_Leading;
+        const TRAILING = sys::ImGuiTabItemFlags_Trailing;
     }
 }
 
@@ -183,8 +183,7 @@ impl Ui {
         id: impl AsRef<str>,
         flags: TabBarFlags,
     ) -> Option<TabBarToken<'_>> {
-        let should_render =
-            unsafe { sys::igBeginTabBar(self.scratch_txt(id), flags.bits() as i32) };
+        let should_render = unsafe { sys::igBeginTabBar(self.scratch_txt(id), flags.bits()) };
 
         if should_render {
             Some(TabBarToken::new(self))
@@ -227,7 +226,7 @@ impl Ui {
             sys::igBeginTabItem(
                 self.scratch_txt(label),
                 opened.map(|x| x as *mut bool).unwrap_or(ptr::null_mut()),
-                flags.bits() as i32,
+                flags.bits(),
             )
         };
 

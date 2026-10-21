@@ -159,9 +159,88 @@ widget values; disable live editing for mixed-value text inputs when undo could
 otherwise apply to all selected objects.
 
 Dark/light themes and docking empty backgrounds adopt upstream's revised colors.
-New font remapping and loader signatures are available in `imgui-sys`; there are
-no new safe font-remapping wrappers. External and WASM providers must rebuild
+Safe font remapping is available through `FontAtlas`; loader signatures remain
+available in `imgui-sys`. External and WASM providers must rebuild
 against the matching 1.93.0 sources and compiler defines.
+
+### Additional drawing and font APIs
+
+Use `add_line_h`/`add_line_v` for pixel-aligned axis lines. Quads, n-gons,
+ellipses, quadratic Béziers and concave polygon fills now have safe wrappers.
+`draw_list.path()` buffers a path independently; finish it with `stroke`,
+`fill_convex`, or `fill_concave`. Dropping an unfinished path draws nothing.
+
+```rust,ignore
+draw_list.add_ellipse([80.0, 80.0], [40.0, 20.0], color)
+    .rotation(0.4).thickness(3.0).flags(DrawFlags::STROKE_INSIDE).build();
+draw_list.path().line_to([10.0, 10.0])
+    .bezier_quadratic_to([50.0, 60.0], [90.0, 10.0], 0)
+    .stroke(color, 2.0, DrawFlags::CAP_ROUND);
+
+let font = ctx.fonts().add_font(&[imgui::FontSource::DefaultFontVector { config: None }]);
+ctx.fonts().remap_codepoint(font, '\u{e000}', 'A');
+let ui = ctx.frame();
+let _font = ui.push_font_with_size(font, 24.0);
+let baked = ui.current_font_baked();
+let glyph = baked.find_glyph('A'); // Owned copy, valid after further glyph loads.
+ui.text("Dynamic font sizing");
+```
+
+Dynamic sizes require a backend with `BackendFlags::RENDERER_HAS_TEXTURES`.
+`push_font_size` resizes the current font; zero preserves its current size.
+The baked-font view is tied to the UI frame, so it cannot survive a new frame
+or cache compaction. Apply remappings before baking the affected glyphs.
+Raw glyph-index remapping validates the selected TrueType/OpenType source's
+glyph count, rejects index zero/out-of-range values, and returns false for
+unknown sources/formats. `DefaultFontBitmap` selects the fixed bitmap default.
+
+### Core renderer integration
+
+`TextureId::id()` now returns `u64`, matching `ImTextureID` even on WASM32.
+Use `TextureId::from_u64` for graphics handles; use checked conversion if your
+backend requires a narrower integer. The generic `Textures` registry starts
+at one because zero is the invalid identifier for managed textures.
+
+Before drawing, iterate `DrawData::textures()` and handle its requests:
+
+```rust,ignore
+for mut texture in draw_data.textures() {
+    match texture.status() {
+        imgui::TextureStatus::WantCreate => {
+            let id = upload(texture.size(), texture.format(), texture.pitch(), texture.pixels())?;
+            texture.mark_created(id);
+        }
+        imgui::TextureStatus::WantUpdates => {
+            // Rectangle rows use the full texture pitch, not the rectangle width.
+            upload_regions(texture.texture_id(), texture.pitch(), texture.pixels(), texture.updates())?;
+            texture.mark_updated();
+        }
+        imgui::TextureStatus::WantDestroy => {
+            destroy(texture.texture_id());
+            texture.mark_destroyed();
+        }
+        _ => {}
+    }
+}
+```
+
+Leave failed requests unacknowledged to retry them. `Context::textures()` also
+supports renderer shutdown; inspect reference counts when sharing atlases.
+Pixel borrows cannot outlive their frame/context. `OwnedDrawData` copies CPU
+pixels, update rectangles and texture references; acknowledging its snapshot
+does not acknowledge requests in the source context. Copy renderer identifiers
+back through the live request API if your renderer uploads from a snapshot.
+
+Capture `ctx.platform_io().renderer_callbacks()` before `ctx.render()`.
+Pure Rust backends can initialize the supported operations with
+`ctx.platform_io_mut().register_renderer_callbacks(&[RendererCallback::ResetRenderState,
+RendererCallback::SetSamplerLinear, RendererCallback::SetSamplerNearest])`.
+Use its `classify(&command)` method to dispatch standard reset/linear/nearest/
+texture-sampler commands in Rust. `draw_list.add_renderer_callback(kind)` queues
+registered operations and returns false for unsupported ones. Callback pointers
+are registered by backend initialization; native callbacks remain compatible
+with upstream backends. Unknown application callbacks retain the existing raw
+callback contract. Separate backend repositories are outside this change.
 
 Validate default, docking, FreeType, docking+FreeType, and `tables-api`, including
 the C++ ABI tests, doctests, and documentation. On Windows use

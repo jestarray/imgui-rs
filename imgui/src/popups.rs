@@ -133,7 +133,7 @@ impl<'ui, 'p, Label: AsRef<str>> PopupModal<'ui, 'p, Label> {
                 self.opened
                     .map(|x| x as *mut bool)
                     .unwrap_or(ptr::null_mut()),
-                self.flags.bits() as i32,
+                self.flags.bits(),
             )
         };
 
@@ -168,9 +168,8 @@ impl Ui {
     /// to signal that this popup is active.
     #[doc(alias = "BeginPopup")]
     pub fn begin_popup(&self, str_id: impl AsRef<str>) -> Option<PopupToken<'_>> {
-        let render = unsafe {
-            sys::igBeginPopup(self.scratch_txt(str_id), WindowFlags::empty().bits() as i32)
-        };
+        let render =
+            unsafe { sys::igBeginPopup(self.scratch_txt(str_id), WindowFlags::empty().bits()) };
 
         if render {
             Some(PopupToken::new(self))
@@ -253,7 +252,7 @@ impl Ui {
         let render = unsafe {
             sys::igBeginPopupContextItem(
                 std::ptr::null(),
-                imgui_sys::ImGuiPopupFlags_MouseButtonRight as i32,
+                imgui_sys::ImGuiPopupFlags_MouseButtonRight,
             )
         };
 
@@ -276,7 +275,7 @@ impl Ui {
         let render = unsafe {
             sys::igBeginPopupContextItem(
                 self.scratch_txt(str_id),
-                imgui_sys::ImGuiPopupFlags_MouseButtonRight as i32,
+                imgui_sys::ImGuiPopupFlags_MouseButtonRight,
             )
         };
 
@@ -297,7 +296,7 @@ impl Ui {
         let render = unsafe {
             sys::igBeginPopupContextWindow(
                 std::ptr::null(),
-                imgui_sys::ImGuiPopupFlags_MouseButtonRight as i32,
+                imgui_sys::ImGuiPopupFlags_MouseButtonRight,
             )
         };
 
@@ -320,7 +319,7 @@ impl Ui {
         let render = unsafe {
             sys::igBeginPopupContextWindow(
                 self.scratch_txt(str_id),
-                imgui_sys::ImGuiPopupFlags_MouseButtonRight as i32,
+                imgui_sys::ImGuiPopupFlags_MouseButtonRight,
             )
         };
 
@@ -341,7 +340,7 @@ impl Ui {
         let render = unsafe {
             sys::igBeginPopupContextVoid(
                 std::ptr::null(),
-                imgui_sys::ImGuiPopupFlags_MouseButtonRight as i32,
+                imgui_sys::ImGuiPopupFlags_MouseButtonRight,
             )
         };
 
@@ -364,7 +363,7 @@ impl Ui {
         let render = unsafe {
             sys::igBeginPopupContextVoid(
                 self.scratch_txt(str_id),
-                imgui_sys::ImGuiPopupFlags_MouseButtonRight as i32,
+                imgui_sys::ImGuiPopupFlags_MouseButtonRight,
             )
         };
 
