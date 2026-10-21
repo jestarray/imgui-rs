@@ -134,7 +134,7 @@ jobs:
 
       - name: freetype and docking (non-Windows, pkg-config)
         if: matrix.os != 'windows-latest'
-        run: cargo test --workspace --all-targets --features freetype,docking
+        run: cargo test --workspace --all-targets --features freetype,docking,tables-api
 
       - name: freetype feature (Windows, vcpkg)
         if: matrix.os == 'windows-latest'
@@ -142,7 +142,15 @@ jobs:
 
       - name: freetype and docking (Windows, vcpkg)
         if: matrix.os == 'windows-latest'
-        run: cargo test --workspace --all-targets --features freetype,docking,use-vcpkg
+        run: cargo test --workspace --all-targets --features freetype,docking,tables-api,use-vcpkg
+
+      - name: Check WASM binding selections without native linking
+        run: |
+          rustup target add wasm32-unknown-unknown
+          cargo check -p imgui --target wasm32-unknown-unknown --features wasm
+          cargo check -p imgui --target wasm32-unknown-unknown --features wasm,docking
+          cargo check -p imgui --target wasm32-unknown-unknown --features wasm,freetype
+          cargo check -p imgui --target wasm32-unknown-unknown --features wasm,docking,freetype
 
       - run: cargo test --workspace --doc
       # run to check for lint problems

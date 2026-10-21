@@ -192,20 +192,20 @@ pub struct Style {
     ///
     /// Disable if you are really tight on CPU/GPU. Latched at the beginning of the frame.
     pub anti_aliased_lines: bool,
-    /// Enable anti-aliased lines/borders using textures where possible.
+    /// Enable anti-aliased line endings. Disabled by default; useful for thick strokes.
     ///
-    /// Require back-end to render with bilinear filtering. Latched at the beginning of the frame.
-    pub anti_aliased_lines_use_tex: bool,
+    /// Requires anti-aliased lines. Latched at the beginning of the frame.
+    pub anti_aliased_line_ends: bool,
     /// Enable anti-aliased edges around filled shapes (rounded recatngles, circles, etc.).
     ///
     /// Disable if you are really tight on CPU/GPU. Latched at the beginning of the frame.
     pub anti_aliased_fill: bool,
-    /// Tessellation tolerance when using path_bezier_curve_to without a specific number of
+    /// Maximum tessellation error in pixels when using path_bezier_curve_to without a specific number of
     /// segments.
     ///
     /// Decrease for highly tessellated curves (higher quality, more polygons), increase to reduce
     /// quality.
-    pub curve_tessellation_tol: f32,
+    pub curve_tessellation_max_error: f32,
     /// Maximum error (in pixels) allowed when drawing circles or rounded corner rectangles with no
     /// explicit segment count specified.
     ///
@@ -827,7 +827,10 @@ mod tests {
         assert_field_offset!(tab_border_size, TabBorderSize);
         assert_field_offset!(tab_min_width_base, TabMinWidthBase);
         assert_field_offset!(tab_min_width_shrink, TabMinWidthShrink);
-        assert_field_offset!(tab_close_button_min_width_selected, TabCloseButtonMinWidthSelected);
+        assert_field_offset!(
+            tab_close_button_min_width_selected,
+            TabCloseButtonMinWidthSelected
+        );
         assert_field_offset!(
             tab_close_button_min_width_unselected,
             TabCloseButtonMinWidthUnselected
@@ -856,9 +859,9 @@ mod tests {
         assert_field_offset!(docking_separator_size, DockingSeparatorSize);
         assert_field_offset!(mouse_cursor_scale, MouseCursorScale);
         assert_field_offset!(anti_aliased_lines, AntiAliasedLines);
-        assert_field_offset!(anti_aliased_lines_use_tex, AntiAliasedLinesUseTex);
+        assert_field_offset!(anti_aliased_line_ends, AntiAliasedLineEnds);
         assert_field_offset!(anti_aliased_fill, AntiAliasedFill);
-        assert_field_offset!(curve_tessellation_tol, CurveTessellationTol);
+        assert_field_offset!(curve_tessellation_max_error, CurveTessellationMaxError);
         assert_field_offset!(circle_tesselation_max_error, CircleTessellationMaxError);
         assert_field_offset!(colors, Colors);
         assert_field_offset!(hover_stationary_delay, HoverStationaryDelay);

@@ -17,8 +17,10 @@ bitflags! {
         const NO_POWER_OF_TWO_HEIGHT = sys::ImFontAtlasFlags_NoPowerOfTwoHeight as i32;
         /// Don't build software mouse cursors into the atlas
         const NO_MOUSE_CURSORS = sys::ImFontAtlasFlags_NoMouseCursors as i32;
-        /// Don't build thick line textures into the atlas
+        /// Do not bake line textures. This disables anti-aliased lines and line endings.
         const NO_BAKED_LINES = sys::ImFontAtlasFlags_NoBakedLines as i32;
+        /// Do not bake rounded-corner textures; use tessellation instead.
+        const NO_BAKED_ROUND_CORNERS = sys::ImFontAtlasFlags_NoBakedRoundCorners as i32;
     }
 }
 
@@ -59,7 +61,6 @@ pub struct FontAtlas {
     tex_uv_white_pixel: sys::ImVec2,
     fonts: ImVector<*mut Font>,
     sources: sys::ImVector_ImFontConfig,
-    tex_uv_lines: [sys::ImVec4; 33],
     tex_next_unique_id: i32,
     font_next_unique_id: i32,
     draw_list_shared_datas: sys::ImVector_ImDrawListSharedDataPtr,
@@ -164,15 +165,15 @@ impl FontAtlas {
             } else {
                 sys::ImTextureFormat_RGBA32
             };
-            
+
             // Build atlas on demand if not already built (matches Dear ImGui 1.92+ behavior)
             // This matches the logic in GetTexDataAsFormat() from imgui_draw.cpp
             let atlas_ptr = self as *mut FontAtlas;
-            let needs_build = !(*atlas_ptr).tex_is_built 
-                || (*atlas_ptr).tex_data.is_null() 
+            let needs_build = !(*atlas_ptr).tex_is_built
+                || (*atlas_ptr).tex_data.is_null()
                 || (*(*atlas_ptr).tex_data).Pixels.is_null()
                 || (*(*atlas_ptr).raw_mut()).TexDesiredFormat != format;
-            
+
             if needs_build {
                 let raw_atlas = (*atlas_ptr).raw_mut();
                 (*raw_atlas).TexDesiredFormat = format;
@@ -180,7 +181,7 @@ impl FontAtlas {
                 // This is what GetTexDataAsFormat() calls internally
                 sys::ImFontAtlas_BuildMain_Wrapper(raw_atlas);
             }
-            
+
             let tex_data = (*atlas_ptr).tex_data;
             assert!(
                 !tex_data.is_null(),
@@ -288,7 +289,6 @@ fn test_font_atlas_memory_layout() {
     assert_field_offset!(tex_uv_white_pixel, TexUvWhitePixel);
     assert_field_offset!(fonts, Fonts);
     assert_field_offset!(sources, Sources);
-    assert_field_offset!(tex_uv_lines, TexUvLines);
     assert_field_offset!(tex_next_unique_id, TexNextUniqueID);
     assert_field_offset!(font_next_unique_id, FontNextUniqueID);
     assert_field_offset!(draw_list_shared_datas, DrawListSharedDatas);
@@ -568,24 +568,49 @@ impl Drop for SharedFontAtlas {
 
 #[cfg(test)]
 mod tests {
+    use super::FontAtlasFlags;
     use crate::FontSource;
+
+    #[test]
+    fn test_baking_options() {
+        for flags in [
+            FontAtlasFlags::NO_BAKED_ROUND_CORNERS,
+            FontAtlasFlags::NO_BAKED_LINES,
+        ] {
+            let (_guard, mut ctx) = crate::test::test_ctx_initialized();
+            ctx.fonts().flags.insert(flags);
+            ctx.fonts()
+                .add_font(&[FontSource::DefaultFontData { config: None }]);
+            assert!(!ctx.fonts().build_rgba32_texture().data.is_empty());
+            ctx.style_mut().anti_aliased_line_ends = true;
+            let ui = ctx.frame();
+            if flags.contains(FontAtlasFlags::NO_BAKED_LINES) {
+                assert!(!ui.clone_style().anti_aliased_lines);
+                assert!(!ui.clone_style().anti_aliased_line_ends);
+            }
+            ui.get_background_draw_list()
+                .add_rect([10.0, 10.0], [50.0, 50.0], crate::ImColor32::WHITE)
+                .rounding(8.0)
+                .build();
+            assert!(ctx.render().total_vtx_count > 0);
+        }
+    }
 
     #[test]
     fn test_build_texture_before_first_frame() {
         // Regression test for hudhook bug: build_rgba32_texture should work before NewFrame
         // by building the atlas on demand (like Dear ImGui 1.92+ GetTexDataAsRGBA32)
-        
+
         // Use test serialization to avoid context conflicts in parallel tests
         let (_guard, mut ctx) = crate::test::test_ctx();
-        
+
         // Add default font
-        ctx.fonts().add_font(&[FontSource::DefaultFontData {
-            config: None,
-        }]);
-        
+        ctx.fonts()
+            .add_font(&[FontSource::DefaultFontData { config: None }]);
+
         // Build texture before first frame - should not panic
         let texture = ctx.fonts().build_rgba32_texture();
-        
+
         // Verify texture data
         assert!(texture.width > 0, "texture width should be positive");
         assert!(texture.height > 0, "texture height should be positive");
@@ -595,7 +620,7 @@ mod tests {
             (texture.width as usize) * (texture.height as usize) * 4,
             "texture data size should match width * height * 4 (RGBA)"
         );
-        
+
         // Context and guard dropped here, releasing the mutex
     }
 
@@ -603,14 +628,13 @@ mod tests {
     fn test_build_alpha8_texture_before_first_frame() {
         // Test alpha8 variant as well
         let (_guard, mut ctx) = crate::test::test_ctx();
-        
-        ctx.fonts().add_font(&[FontSource::DefaultFontData {
-            config: None,
-        }]);
-        
+
+        ctx.fonts()
+            .add_font(&[FontSource::DefaultFontData { config: None }]);
+
         // Build alpha8 texture before first frame
         let texture = ctx.fonts().build_alpha8_texture();
-        
+
         assert!(texture.width > 0);
         assert!(texture.height > 0);
         assert!(!texture.data.is_empty());
@@ -625,19 +649,18 @@ mod tests {
     fn test_rebuild_texture_after_format_change() {
         // Test that changing format triggers rebuild
         let (_guard, mut ctx) = crate::test::test_ctx();
-        
-        ctx.fonts().add_font(&[FontSource::DefaultFontData {
-            config: None,
-        }]);
-        
+
+        ctx.fonts()
+            .add_font(&[FontSource::DefaultFontData { config: None }]);
+
         // Build as RGBA32 first
         let texture1 = ctx.fonts().build_rgba32_texture();
         let size1 = texture1.data.len();
-        
+
         // Build as Alpha8 - should rebuild with different size
         let texture2 = ctx.fonts().build_alpha8_texture();
         let size2 = texture2.data.len();
-        
+
         // Alpha8 should be 1/4 the size of RGBA32
         assert_eq!(size1, size2 * 4, "RGBA32 should be 4x larger than Alpha8");
     }

@@ -23,39 +23,48 @@ use crate::render::renderer::TextureId;
 
 use std::marker::PhantomData;
 
-bitflags!(
-    /// Options for some DrawList operations.
-    #[repr(C)]
-    pub struct DrawFlags: i32 {
-        const CLOSED = sys::ImDrawFlags_Closed;
-        const ROUND_CORNERS_TOP_LEFT = sys::ImDrawFlags_RoundCornersTopLeft;
-        const ROUND_CORNERS_TOP_RIGHT = sys::ImDrawFlags_RoundCornersTopRight;
-        const ROUND_CORNERS_BOT_LEFT = sys::ImDrawFlags_RoundCornersBottomLeft;
-        const ROUND_CORNERS_BOT_RIGHT = sys::ImDrawFlags_RoundCornersBottomRight;
-        const ROUND_CORNERS_TOP = sys::ImDrawFlags_RoundCornersTop;
-        const ROUND_CORNERS_BOT = sys::ImDrawFlags_RoundCornersBottom;
-        const ROUND_CORNERS_LEFT = sys::ImDrawFlags_RoundCornersLeft;
-        const ROUND_CORNERS_RIGHT = sys::ImDrawFlags_RoundCornersRight;
-        const ROUND_CORNERS_ALL = sys::ImDrawFlags_RoundCornersAll;
-        const ROUND_CORNERS_NONE = sys::ImDrawFlags_RoundCornersNone;
-    }
-);
+#[cfg(test)]
+mod tests;
 
 bitflags!(
-    /// Draw list flags
+    /// Options for draw-list primitives and scoped drawing state.
+    ///
+    /// Select at most one `STROKE_*` value: these are encoded positions, not
+    /// independent bits. An empty value uses upstream's default stroke position.
     #[repr(C)]
-    pub struct DrawListFlags: i32 {
-        /// Enable anti-aliased lines/borders (*2 the number of triangles for 1.0f wide line or lines
-        /// thin enough to be drawn using textures, otherwise *3 the number of triangles)
-        const ANTI_ALIASED_LINES = sys::ImDrawListFlags_AntiAliasedLines as i32;
-        /// Enable anti-aliased lines/borders using textures when possible. Require backend to render
-        /// with bilinear filtering.
-        const ANTI_ALIASED_LINES_USE_TEX = sys::ImDrawListFlags_AntiAliasedLinesUseTex as i32;
-        /// Enable anti-aliased edge around filled shapes (rounded rectangles, circles).
-        const ANTI_ALIASED_FILL = sys::ImDrawListFlags_AntiAliasedFill as i32;
-        /// Can emit 'VtxOffset > 0' to allow large meshes. Set when
-        /// [`BackendFlags::RENDERER_HAS_VTX_OFFSET`] is enabled.
-        const ALLOW_VTX_OFFSET = sys::ImDrawListFlags_AllowVtxOffset as i32;
+    pub struct DrawFlags: i32 {
+        const ROUND_TOP_LEFT = sys::ImDrawFlags_RoundTopLeft;
+        const ROUND_TOP_RIGHT = sys::ImDrawFlags_RoundTopRight;
+        const ROUND_BOTTOM_LEFT = sys::ImDrawFlags_RoundBottomLeft;
+        const ROUND_BOTTOM_RIGHT = sys::ImDrawFlags_RoundBottomRight;
+        const ROUND_TOP = sys::ImDrawFlags_RoundTop;
+        const ROUND_BOTTOM = sys::ImDrawFlags_RoundBottom;
+        const ROUND_LEFT = sys::ImDrawFlags_RoundLeft;
+        const ROUND_RIGHT = sys::ImDrawFlags_RoundRight;
+        const ROUND_ALL = sys::ImDrawFlags_RoundAll;
+        const ROUND_NONE = sys::ImDrawFlags_RoundNone;
+        /// Close a polyline by joining its last point to its first.
+        const CLOSED = sys::ImDrawFlags_Closed;
+        /// Use miter joins; acute corners may extend far beyond the shape.
+        const JOIN_MITER = sys::ImDrawFlags_JoinMiter;
+        /// Extend open stroke ends with square caps.
+        const CAP_SQUARE = sys::ImDrawFlags_CapSquare;
+        const AA_FILL = sys::ImDrawFlags_AAFill;
+        const AA_LINES = sys::ImDrawFlags_AALines;
+        /// Anti-alias stroke ends; requires `AA_LINES`.
+        const AA_LINE_ENDS = sys::ImDrawFlags_AALineEnds;
+        const STROKE_INSIDE = sys::ImDrawFlags_StrokeInside;
+        const STROKE_CENTER = sys::ImDrawFlags_StrokeCenter;
+        const STROKE_CENTER_BIASED = sys::ImDrawFlags_StrokeCenterBiased;
+        const STROKE_OUTSIDE = sys::ImDrawFlags_StrokeOutside;
+        /// Emulate pre-1.93 offsets and stroke positioning.
+        const STROKE_LEGACY = sys::ImDrawFlags_StrokeLegacy;
+        const TEXT_NO_PIXEL_SNAP = sys::ImDrawFlags_TextNoPixelSnap;
+        /// Use baked corner textures where possible (scope only).
+        const USE_TEX_FOR_ROUND_CORNERS = sys::ImDrawFlags_UseTexForRoundCorners;
+        /// Allow vertex offsets for large meshes (scope only).
+        /// Requires renderer support for vertex offsets.
+        const USE_VTX_OFFSET = sys::ImDrawFlags_UseVtxOffset;
     }
 );
 
@@ -168,6 +177,40 @@ impl DrawListMut<'_> {
             draw_list_type: DrawListType::Foreground,
             _phantom: PhantomData,
         }
+    }
+
+    /// Temporarily enable or disable drawing flags on this draw list.
+    ///
+    /// Flags are restored on return and during panic unwinding. Stroke positions,
+    /// joins and caps are per-primitive options; only `STROKE_LEGACY` can be scoped.
+    ///
+    /// # Panics
+    /// Panics before changing state if flags are not allowed in a drawing scope
+    /// or the upstream nesting limit of three scopes would be exceeded.
+    pub fn with_draw_flag<R>(&self, flags: DrawFlags, enabled: bool, f: impl FnOnce() -> R) -> R {
+        let bits = flags.bits();
+        let stroke = bits & sys::ImDrawFlags_StrokeMask_;
+        assert!(
+            bits & !sys::ImDrawFlags_AllowInPushScope_ == 0
+                && (stroke == 0 || stroke == sys::ImDrawFlags_StrokeLegacy),
+            "flags are not supported in a drawing scope"
+        );
+        // Upstream currently stores three nested scopes inline. Check before
+        // calling C++ so overflow cannot leave an unmatched pop during unwinding.
+        let stack = unsafe { &(*self.draw_list)._DrawFlagsStack };
+        assert!(
+            usize::from(stack.Size) < stack.LocalData.len(),
+            "drawing scope depth limit exceeded"
+        );
+        struct RestoreDrawFlag(*mut ImDrawList);
+        impl Drop for RestoreDrawFlag {
+            fn drop(&mut self) {
+                unsafe { sys::ImDrawList_PopDrawFlag(self.0) };
+            }
+        }
+        unsafe { sys::ImDrawList_PushDrawFlag(self.draw_list, bits, enabled) };
+        let _restore = RestoreDrawFlag(self.draw_list);
+        f()
     }
 
     /// Split into *channels_count* drawing channels.
@@ -483,6 +526,7 @@ pub struct Line<'ui> {
     p2: [f32; 2],
     color: ImColor32,
     thickness: f32,
+    flags: DrawFlags,
     draw_list: &'ui DrawListMut<'ui>,
 }
 
@@ -501,8 +545,16 @@ impl<'ui> Line<'ui> {
             p2: p2.into().into(),
             color: c.into(),
             thickness: 1.0,
+            flags: DrawFlags::empty(),
             draw_list,
         }
+    }
+
+    /// Set drawing options. Select at most one stroke position.
+    /// Filled shapes only use flags accepted by their upstream filling function.
+    pub fn flags(mut self, flags: DrawFlags) -> Self {
+        self.flags = flags;
+        self
     }
 
     /// Set line's thickness (default to 1.0 pixel)
@@ -520,6 +572,7 @@ impl<'ui> Line<'ui> {
                 self.p2.into(),
                 self.color.into(),
                 self.thickness,
+                self.flags.bits(),
             )
         }
     }
@@ -530,6 +583,7 @@ impl<'ui> Line<'ui> {
 pub struct Polyline<'ui> {
     points: Vec<[f32; 2]>,
     thickness: f32,
+    flags: DrawFlags,
     filled: bool,
     color: ImColor32,
     draw_list: &'ui DrawListMut<'ui>,
@@ -545,12 +599,20 @@ impl<'ui> Polyline<'ui> {
             points: points.into_iter().map(|p| p.into().into()).collect(),
             color: c.into(),
             thickness: 1.0,
+            flags: DrawFlags::empty(),
             filled: false,
             draw_list,
         }
     }
 
     /// Set line's thickness (default to 1.0 pixel). Has no effect if
+    /// Set drawing options. Select at most one stroke position.
+    /// Filled shapes only use flags accepted by their upstream filling function.
+    pub fn flags(mut self, flags: DrawFlags) -> Self {
+        self.flags = flags;
+        self
+    }
+
     /// shape is filled
     pub fn thickness(mut self, thickness: f32) -> Self {
         self.thickness = thickness;
@@ -572,6 +634,7 @@ impl<'ui> Polyline<'ui> {
                     self.points.as_ptr() as *const sys::ImVec2,
                     self.points.len() as i32,
                     self.color.into(),
+                    self.flags.bits(),
                 )
             }
         } else {
@@ -582,7 +645,7 @@ impl<'ui> Polyline<'ui> {
                     self.points.len() as i32,
                     self.color.into(),
                     self.thickness,
-                    sys::ImDrawFlags::default(),
+                    self.flags.bits(),
                 )
             }
         }
@@ -617,7 +680,7 @@ impl<'ui> Rect<'ui> {
             p2: p2.into().into(),
             color: c.into(),
             rounding: 0.0,
-            flags: DrawFlags::ROUND_CORNERS_ALL,
+            flags: DrawFlags::ROUND_ALL,
             thickness: 1.0,
             filled: false,
             draw_list,
@@ -633,25 +696,32 @@ impl<'ui> Rect<'ui> {
 
     /// Set flag to indicate if rectangle's top-left corner will be rounded.
     pub fn round_top_left(mut self, value: bool) -> Self {
-        self.flags.set(DrawFlags::ROUND_CORNERS_TOP_LEFT, value);
+        self.flags.set(DrawFlags::ROUND_TOP_LEFT, value);
         self
     }
 
     /// Set flag to indicate if rectangle's top-right corner will be rounded.
     pub fn round_top_right(mut self, value: bool) -> Self {
-        self.flags.set(DrawFlags::ROUND_CORNERS_TOP_RIGHT, value);
+        self.flags.set(DrawFlags::ROUND_TOP_RIGHT, value);
         self
     }
 
     /// Set flag to indicate if rectangle's bottom-left corner will be rounded.
     pub fn round_bot_left(mut self, value: bool) -> Self {
-        self.flags.set(DrawFlags::ROUND_CORNERS_BOT_LEFT, value);
+        self.flags.set(DrawFlags::ROUND_BOTTOM_LEFT, value);
         self
     }
 
     /// Set flag to indicate if rectangle's bottom-right corner will be rounded.
     pub fn round_bot_right(mut self, value: bool) -> Self {
-        self.flags.set(DrawFlags::ROUND_CORNERS_BOT_RIGHT, value);
+        self.flags.set(DrawFlags::ROUND_BOTTOM_RIGHT, value);
+        self
+    }
+
+    /// Set drawing options. Select at most one stroke position.
+    /// Filled shapes only use flags accepted by their upstream filling function.
+    pub fn flags(mut self, flags: DrawFlags) -> Self {
+        self.flags = flags;
         self
     }
 
@@ -704,6 +774,7 @@ pub struct Triangle<'ui> {
     p3: [f32; 2],
     color: ImColor32,
     thickness: f32,
+    flags: DrawFlags,
     filled: bool,
     draw_list: &'ui DrawListMut<'ui>,
 }
@@ -725,9 +796,17 @@ impl<'ui> Triangle<'ui> {
             p3: p3.into().into(),
             color: c.into(),
             thickness: 1.0,
+            flags: DrawFlags::empty(),
             filled: false,
             draw_list,
         }
+    }
+
+    /// Set drawing options. Select at most one stroke position.
+    /// Filled shapes only use flags accepted by their upstream filling function.
+    pub fn flags(mut self, flags: DrawFlags) -> Self {
+        self.flags = flags;
+        self
     }
 
     /// Set triangle's thickness (default to 1.0 pixel)
@@ -763,6 +842,7 @@ impl<'ui> Triangle<'ui> {
                     self.p3.into(),
                     self.color.into(),
                     self.thickness,
+                    self.flags.bits(),
                 )
             }
         }
@@ -777,6 +857,7 @@ pub struct Circle<'ui> {
     color: ImColor32,
     num_segments: u32,
     thickness: f32,
+    flags: DrawFlags,
     filled: bool,
     draw_list: &'ui DrawListMut<'ui>,
 }
@@ -798,6 +879,7 @@ impl<'ui> Circle<'ui> {
             color: color.into(),
             num_segments: 0,
             thickness: 1.0,
+            flags: DrawFlags::empty(),
             filled: false,
             draw_list,
         }
@@ -807,6 +889,13 @@ impl<'ui> Circle<'ui> {
     /// Add more segments if you want a smoother circle.
     pub fn num_segments(mut self, num_segments: u32) -> Self {
         self.num_segments = num_segments;
+        self
+    }
+
+    /// Set drawing options. Select at most one stroke position.
+    /// Filled shapes only use flags accepted by their upstream filling function.
+    pub fn flags(mut self, flags: DrawFlags) -> Self {
+        self.flags = flags;
         self
     }
 
@@ -843,6 +932,7 @@ impl<'ui> Circle<'ui> {
                     self.color.into(),
                     self.num_segments as i32,
                     self.thickness,
+                    self.flags.bits(),
                 )
             }
         }
@@ -858,6 +948,7 @@ pub struct BezierCurve<'ui> {
     cp1: [f32; 2],
     color: ImColor32,
     thickness: f32,
+    flags: DrawFlags,
     /// If num_segments is not set, the bezier curve is auto-tessalated.
     num_segments: Option<u32>,
     draw_list: &'ui DrawListMut<'ui>,
@@ -883,9 +974,17 @@ impl<'ui> BezierCurve<'ui> {
             pos1: pos1.into().into(),
             color: c.into(),
             thickness: 1.0,
+            flags: DrawFlags::empty(),
             num_segments: None,
             draw_list,
         }
+    }
+
+    /// Set drawing options. Select at most one stroke position.
+    /// Filled shapes only use flags accepted by their upstream filling function.
+    pub fn flags(mut self, flags: DrawFlags) -> Self {
+        self.flags = flags;
+        self
     }
 
     /// Set curve's thickness (default to 1.0 pixel)
@@ -913,6 +1012,7 @@ impl<'ui> BezierCurve<'ui> {
                 self.color.into(),
                 self.thickness,
                 self.num_segments.unwrap_or(0) as i32,
+                self.flags.bits(),
             )
         }
     }
@@ -1110,7 +1210,7 @@ impl<'ui> ImageRounded<'ui> {
             uv_max: [1.0, 1.0],
             col: [1.0, 1.0, 1.0, 1.0].into(),
             rounding,
-            draw_flags: DrawFlags::ROUND_CORNERS_ALL,
+            draw_flags: DrawFlags::ROUND_ALL,
             draw_list,
         }
     }
@@ -1137,35 +1237,31 @@ impl<'ui> ImageRounded<'ui> {
 
     /// Set flag to indicate rounding on all all corners.
     pub fn round_all(mut self, value: bool) -> Self {
-        self.draw_flags.set(DrawFlags::ROUND_CORNERS_ALL, value);
+        self.draw_flags.set(DrawFlags::ROUND_ALL, value);
         self
     }
 
     /// Set flag to indicate if image's top-left corner will be rounded.
     pub fn round_top_left(mut self, value: bool) -> Self {
-        self.draw_flags
-            .set(DrawFlags::ROUND_CORNERS_TOP_LEFT, value);
+        self.draw_flags.set(DrawFlags::ROUND_TOP_LEFT, value);
         self
     }
 
     /// Set flag to indicate if image's top-right corner will be rounded.
     pub fn round_top_right(mut self, value: bool) -> Self {
-        self.draw_flags
-            .set(DrawFlags::ROUND_CORNERS_TOP_RIGHT, value);
+        self.draw_flags.set(DrawFlags::ROUND_TOP_RIGHT, value);
         self
     }
 
     /// Set flag to indicate if image's bottom-left corner will be rounded.
     pub fn round_bot_left(mut self, value: bool) -> Self {
-        self.draw_flags
-            .set(DrawFlags::ROUND_CORNERS_BOT_LEFT, value);
+        self.draw_flags.set(DrawFlags::ROUND_BOTTOM_LEFT, value);
         self
     }
 
     /// Set flag to indicate if image's bottom-right corner will be rounded.
     pub fn round_bot_right(mut self, value: bool) -> Self {
-        self.draw_flags
-            .set(DrawFlags::ROUND_CORNERS_BOT_RIGHT, value);
+        self.draw_flags.set(DrawFlags::ROUND_BOTTOM_RIGHT, value);
         self
     }
 

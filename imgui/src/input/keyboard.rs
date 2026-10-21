@@ -368,9 +368,9 @@ impl Ui {
     pub fn is_key_down(&self, key: Key) -> bool {
         cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
-                unsafe { sys::igIsKeyDown_Nil(key as u32) }
+                unsafe { sys::igIsKeyDown_Nil(key as sys::ImGuiKey) }
             } else {
-                unsafe { sys::igIsKeyDown(key as u32) }
+                unsafe { sys::igIsKeyDown(key as sys::ImGuiKey) }
             }
         }
     }
@@ -383,9 +383,9 @@ impl Ui {
     pub fn is_key_pressed(&self, key: Key) -> bool {
         cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
-                unsafe { sys::igIsKeyPressed_Bool(key as u32, true) }
+                unsafe { sys::igIsKeyPressed_Bool(key as sys::ImGuiKey, true) }
             } else {
-                unsafe { sys::igIsKeyPressed(key as u32, true) }
+                unsafe { sys::igIsKeyPressed(key as sys::ImGuiKey, true) }
             }
         }
     }
@@ -398,9 +398,9 @@ impl Ui {
     pub fn is_key_pressed_no_repeat(&self, key: Key) -> bool {
         cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
-                unsafe { sys::igIsKeyPressed_Bool(key as u32, false) }
+                unsafe { sys::igIsKeyPressed_Bool(key as sys::ImGuiKey, false) }
             } else {
-                unsafe { sys::igIsKeyPressed(key as u32, false) }
+                unsafe { sys::igIsKeyPressed(key as sys::ImGuiKey, false) }
             }
         }
     }
@@ -411,9 +411,9 @@ impl Ui {
     pub fn is_key_released(&self, key: Key) -> bool {
         cfg_if::cfg_if! {
             if #[cfg(feature = "docking")] {
-                unsafe { sys::igIsKeyReleased_Nil(key as u32) }
+                unsafe { sys::igIsKeyReleased_Nil(key as sys::ImGuiKey) }
             } else {
-                unsafe { sys::igIsKeyReleased(key as u32) }
+                unsafe { sys::igIsKeyReleased(key as sys::ImGuiKey) }
             }
         }
     }
@@ -425,7 +425,7 @@ impl Ui {
     #[inline]
     #[doc(alias = "GetKeyPressedAmount")]
     pub fn key_pressed_amount(&self, key: Key, repeat_delay: f32, rate: f32) -> u32 {
-        unsafe { sys::igGetKeyPressedAmount(key as u32, repeat_delay, rate) as u32 }
+        unsafe { sys::igGetKeyPressedAmount(key as sys::ImGuiKey, repeat_delay, rate) as u32 }
     }
 
     /// Focuses keyboard on the next widget.

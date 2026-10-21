@@ -12,9 +12,6 @@ ImGuiStoragePair_ImGuiStoragePair	3
 1	nil	ImGuiStoragePair_ImGuiStoragePair_Int (ImGuiID,int)
 2	nil	ImGuiStoragePair_ImGuiStoragePair_Float (ImGuiID,float)
 3	nil	ImGuiStoragePair_ImGuiStoragePair_Ptr (ImGuiID,void*)
-ImGuiTextRange_ImGuiTextRange	2
-1	nil	ImGuiTextRange_ImGuiTextRange_Nil ()
-2	nil	ImGuiTextRange_ImGuiTextRange_Str (const char*,const char*)
 ImTextureRef_ImTextureRef	2
 1	nil	ImTextureRef_ImTextureRef_Nil ()
 2	nil	ImTextureRef_ImTextureRef_TextureID (ImTextureID)
@@ -139,4 +136,4 @@ igValue	4
 2	void	igValue_Int (const char*,int)
 3	void	igValue_Uint (const char*,unsigned int)
 4	void	igValue_Float (const char*,float,const char*)
-98 overloaded
+96 overloaded

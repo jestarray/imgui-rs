@@ -142,59 +142,12 @@ where
         }
     }
 }
-pub type __off_t = ::core::ffi::c_long;
-pub type __off64_t = ::core::ffi::c_long;
-pub type FILE = _IO_FILE;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _IO_marker {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _IO_codecvt {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct _IO_wide_data {
-    _unused: [u8; 0],
-}
-pub type _IO_lock_t = ::core::ffi::c_void;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct _IO_FILE {
-    pub _flags: ::core::ffi::c_int,
-    pub _IO_read_ptr: *mut ::core::ffi::c_char,
-    pub _IO_read_end: *mut ::core::ffi::c_char,
-    pub _IO_read_base: *mut ::core::ffi::c_char,
-    pub _IO_write_base: *mut ::core::ffi::c_char,
-    pub _IO_write_ptr: *mut ::core::ffi::c_char,
-    pub _IO_write_end: *mut ::core::ffi::c_char,
-    pub _IO_buf_base: *mut ::core::ffi::c_char,
-    pub _IO_buf_end: *mut ::core::ffi::c_char,
-    pub _IO_save_base: *mut ::core::ffi::c_char,
-    pub _IO_backup_base: *mut ::core::ffi::c_char,
-    pub _IO_save_end: *mut ::core::ffi::c_char,
-    pub _markers: *mut _IO_marker,
-    pub _chain: *mut _IO_FILE,
-    pub _fileno: ::core::ffi::c_int,
-    pub _flags2: ::core::ffi::c_int,
-    pub _old_offset: __off_t,
-    pub _cur_column: ::core::ffi::c_ushort,
-    pub _vtable_offset: ::core::ffi::c_schar,
-    pub _shortbuf: [::core::ffi::c_char; 1usize],
-    pub _lock: *mut _IO_lock_t,
-    pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
-    pub _freeres_list: *mut _IO_FILE,
-    pub _freeres_buf: *mut ::core::ffi::c_void,
-    pub __pad5: usize,
-    pub _mode: ::core::ffi::c_int,
-    pub _unused2: [::core::ffi::c_char; 20usize],
+pub struct _iobuf {
+    pub _Placeholder: *mut ::core::ffi::c_void,
 }
-impl Default for _IO_FILE {
+impl Default for _iobuf {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -203,6 +156,8 @@ impl Default for _IO_FILE {
         }
     }
 }
+pub type FILE = _iobuf;
+pub type ImU64 = ::core::ffi::c_ulonglong;
 pub type ImColor = ImColor_c;
 pub type ImRect = ImRect_c;
 pub type ImTextureRef = ImTextureRef_c;
@@ -248,7 +203,6 @@ pub type ImU16 = ::core::ffi::c_ushort;
 pub type ImS32 = ::core::ffi::c_int;
 pub type ImU32 = ::core::ffi::c_uint;
 pub type ImS64 = ::core::ffi::c_longlong;
-pub type ImU64 = ::core::ffi::c_ulonglong;
 pub type ImGuiCol = ::core::ffi::c_int;
 pub type ImGuiCond = ::core::ffi::c_int;
 pub type ImGuiDataType = ::core::ffi::c_int;
@@ -257,7 +211,6 @@ pub type ImGuiMouseCursor = ::core::ffi::c_int;
 pub type ImGuiStyleVar = ::core::ffi::c_int;
 pub type ImGuiTableBgTarget = ::core::ffi::c_int;
 pub type ImDrawFlags = ::core::ffi::c_int;
-pub type ImDrawListFlags = ::core::ffi::c_int;
 pub type ImDrawTextFlags = ::core::ffi::c_int;
 pub type ImFontFlags = ::core::ffi::c_int;
 pub type ImFontAtlasFlags = ::core::ffi::c_int;
@@ -366,7 +319,7 @@ pub const ImGuiWindowFlags_Tooltip: ImGuiWindowFlags_ = 33554432;
 pub const ImGuiWindowFlags_Popup: ImGuiWindowFlags_ = 67108864;
 pub const ImGuiWindowFlags_Modal: ImGuiWindowFlags_ = 134217728;
 pub const ImGuiWindowFlags_ChildMenu: ImGuiWindowFlags_ = 268435456;
-pub type ImGuiWindowFlags_ = ::core::ffi::c_uint;
+pub type ImGuiWindowFlags_ = ::core::ffi::c_int;
 pub const ImGuiChildFlags_None: ImGuiChildFlags_ = 0;
 pub const ImGuiChildFlags_Borders: ImGuiChildFlags_ = 1;
 pub const ImGuiChildFlags_AlwaysUseWindowPadding: ImGuiChildFlags_ = 2;
@@ -377,7 +330,7 @@ pub const ImGuiChildFlags_AutoResizeY: ImGuiChildFlags_ = 32;
 pub const ImGuiChildFlags_AlwaysAutoResize: ImGuiChildFlags_ = 64;
 pub const ImGuiChildFlags_FrameStyle: ImGuiChildFlags_ = 128;
 pub const ImGuiChildFlags_NavFlattened: ImGuiChildFlags_ = 256;
-pub type ImGuiChildFlags_ = ::core::ffi::c_uint;
+pub type ImGuiChildFlags_ = ::core::ffi::c_int;
 pub const ImGuiItemFlags_None: ImGuiItemFlags_ = 0;
 pub const ImGuiItemFlags_NoTabStop: ImGuiItemFlags_ = 1;
 pub const ImGuiItemFlags_NoNav: ImGuiItemFlags_ = 2;
@@ -389,7 +342,8 @@ pub const ImGuiItemFlags_Disabled: ImGuiItemFlags_ = 64;
 pub const ImGuiItemFlags_LiveEditOnInputText: ImGuiItemFlags_ = 128;
 pub const ImGuiItemFlags_LiveEditOnInputScalar: ImGuiItemFlags_ = 256;
 pub const ImGuiItemFlags_LiveEditOnInput: ImGuiItemFlags_ = 384;
-pub type ImGuiItemFlags_ = ::core::ffi::c_uint;
+pub const ImGuiItemFlags_MixedValue: ImGuiItemFlags_ = 512;
+pub type ImGuiItemFlags_ = ::core::ffi::c_int;
 pub const ImGuiInputTextFlags_None: ImGuiInputTextFlags_ = 0;
 pub const ImGuiInputTextFlags_CharsDecimal: ImGuiInputTextFlags_ = 1;
 pub const ImGuiInputTextFlags_CharsHexadecimal: ImGuiInputTextFlags_ = 2;
@@ -416,7 +370,7 @@ pub const ImGuiInputTextFlags_CallbackCharFilter: ImGuiInputTextFlags_ = 2097152
 pub const ImGuiInputTextFlags_CallbackResize: ImGuiInputTextFlags_ = 4194304;
 pub const ImGuiInputTextFlags_CallbackEdit: ImGuiInputTextFlags_ = 8388608;
 pub const ImGuiInputTextFlags_WordWrap: ImGuiInputTextFlags_ = 16777216;
-pub type ImGuiInputTextFlags_ = ::core::ffi::c_uint;
+pub type ImGuiInputTextFlags_ = ::core::ffi::c_int;
 pub const ImGuiTreeNodeFlags_None: ImGuiTreeNodeFlags_ = 0;
 pub const ImGuiTreeNodeFlags_Selected: ImGuiTreeNodeFlags_ = 1;
 pub const ImGuiTreeNodeFlags_Framed: ImGuiTreeNodeFlags_ = 2;
@@ -439,7 +393,7 @@ pub const ImGuiTreeNodeFlags_CollapsingHeader: ImGuiTreeNodeFlags_ = 26;
 pub const ImGuiTreeNodeFlags_DrawLinesNone: ImGuiTreeNodeFlags_ = 262144;
 pub const ImGuiTreeNodeFlags_DrawLinesFull: ImGuiTreeNodeFlags_ = 524288;
 pub const ImGuiTreeNodeFlags_DrawLinesToNodes: ImGuiTreeNodeFlags_ = 1048576;
-pub type ImGuiTreeNodeFlags_ = ::core::ffi::c_uint;
+pub type ImGuiTreeNodeFlags_ = ::core::ffi::c_int;
 pub const ImGuiPopupFlags_None: ImGuiPopupFlags_ = 0;
 pub const ImGuiPopupFlags_MouseButtonLeft: ImGuiPopupFlags_ = 4;
 pub const ImGuiPopupFlags_MouseButtonRight: ImGuiPopupFlags_ = 8;
@@ -453,7 +407,7 @@ pub const ImGuiPopupFlags_AnyPopup: ImGuiPopupFlags_ = 3072;
 pub const ImGuiPopupFlags_MouseButtonShift_: ImGuiPopupFlags_ = 2;
 pub const ImGuiPopupFlags_MouseButtonMask_: ImGuiPopupFlags_ = 12;
 pub const ImGuiPopupFlags_InvalidMask_: ImGuiPopupFlags_ = 3;
-pub type ImGuiPopupFlags_ = ::core::ffi::c_uint;
+pub type ImGuiPopupFlags_ = ::core::ffi::c_int;
 pub const ImGuiSelectableFlags_None: ImGuiSelectableFlags_ = 0;
 pub const ImGuiSelectableFlags_NoAutoClosePopups: ImGuiSelectableFlags_ = 1;
 pub const ImGuiSelectableFlags_SpanAllColumns: ImGuiSelectableFlags_ = 2;
@@ -462,7 +416,7 @@ pub const ImGuiSelectableFlags_Disabled: ImGuiSelectableFlags_ = 8;
 pub const ImGuiSelectableFlags_AllowOverlap: ImGuiSelectableFlags_ = 16;
 pub const ImGuiSelectableFlags_Highlight: ImGuiSelectableFlags_ = 32;
 pub const ImGuiSelectableFlags_SelectOnNav: ImGuiSelectableFlags_ = 64;
-pub type ImGuiSelectableFlags_ = ::core::ffi::c_uint;
+pub type ImGuiSelectableFlags_ = ::core::ffi::c_int;
 pub const ImGuiComboFlags_None: ImGuiComboFlags_ = 0;
 pub const ImGuiComboFlags_PopupAlignLeft: ImGuiComboFlags_ = 1;
 pub const ImGuiComboFlags_HeightSmall: ImGuiComboFlags_ = 2;
@@ -473,7 +427,7 @@ pub const ImGuiComboFlags_NoArrowButton: ImGuiComboFlags_ = 32;
 pub const ImGuiComboFlags_NoPreview: ImGuiComboFlags_ = 64;
 pub const ImGuiComboFlags_WidthFitPreview: ImGuiComboFlags_ = 128;
 pub const ImGuiComboFlags_HeightMask_: ImGuiComboFlags_ = 30;
-pub type ImGuiComboFlags_ = ::core::ffi::c_uint;
+pub type ImGuiComboFlags_ = ::core::ffi::c_int;
 pub const ImGuiTabBarFlags_None: ImGuiTabBarFlags_ = 0;
 pub const ImGuiTabBarFlags_Reorderable: ImGuiTabBarFlags_ = 1;
 pub const ImGuiTabBarFlags_AutoSelectNewTabs: ImGuiTabBarFlags_ = 2;
@@ -487,7 +441,7 @@ pub const ImGuiTabBarFlags_FittingPolicyShrink: ImGuiTabBarFlags_ = 256;
 pub const ImGuiTabBarFlags_FittingPolicyScroll: ImGuiTabBarFlags_ = 512;
 pub const ImGuiTabBarFlags_FittingPolicyMask_: ImGuiTabBarFlags_ = 896;
 pub const ImGuiTabBarFlags_FittingPolicyDefault_: ImGuiTabBarFlags_ = 128;
-pub type ImGuiTabBarFlags_ = ::core::ffi::c_uint;
+pub type ImGuiTabBarFlags_ = ::core::ffi::c_int;
 pub const ImGuiTabItemFlags_None: ImGuiTabItemFlags_ = 0;
 pub const ImGuiTabItemFlags_UnsavedDocument: ImGuiTabItemFlags_ = 1;
 pub const ImGuiTabItemFlags_SetSelected: ImGuiTabItemFlags_ = 2;
@@ -498,7 +452,7 @@ pub const ImGuiTabItemFlags_NoReorder: ImGuiTabItemFlags_ = 32;
 pub const ImGuiTabItemFlags_Leading: ImGuiTabItemFlags_ = 64;
 pub const ImGuiTabItemFlags_Trailing: ImGuiTabItemFlags_ = 128;
 pub const ImGuiTabItemFlags_NoAssumedClosure: ImGuiTabItemFlags_ = 256;
-pub type ImGuiTabItemFlags_ = ::core::ffi::c_uint;
+pub type ImGuiTabItemFlags_ = ::core::ffi::c_int;
 pub const ImGuiFocusedFlags_None: ImGuiFocusedFlags_ = 0;
 pub const ImGuiFocusedFlags_ChildWindows: ImGuiFocusedFlags_ = 1;
 pub const ImGuiFocusedFlags_RootWindow: ImGuiFocusedFlags_ = 2;
@@ -506,7 +460,7 @@ pub const ImGuiFocusedFlags_AnyWindow: ImGuiFocusedFlags_ = 4;
 pub const ImGuiFocusedFlags_NoPopupHierarchy: ImGuiFocusedFlags_ = 8;
 pub const ImGuiFocusedFlags_DockHierarchy: ImGuiFocusedFlags_ = 16;
 pub const ImGuiFocusedFlags_RootAndChildWindows: ImGuiFocusedFlags_ = 3;
-pub type ImGuiFocusedFlags_ = ::core::ffi::c_uint;
+pub type ImGuiFocusedFlags_ = ::core::ffi::c_int;
 pub const ImGuiHoveredFlags_None: ImGuiHoveredFlags_ = 0;
 pub const ImGuiHoveredFlags_ChildWindows: ImGuiHoveredFlags_ = 1;
 pub const ImGuiHoveredFlags_RootWindow: ImGuiHoveredFlags_ = 2;
@@ -528,7 +482,7 @@ pub const ImGuiHoveredFlags_DelayNone: ImGuiHoveredFlags_ = 16384;
 pub const ImGuiHoveredFlags_DelayShort: ImGuiHoveredFlags_ = 32768;
 pub const ImGuiHoveredFlags_DelayNormal: ImGuiHoveredFlags_ = 65536;
 pub const ImGuiHoveredFlags_NoSharedDelay: ImGuiHoveredFlags_ = 131072;
-pub type ImGuiHoveredFlags_ = ::core::ffi::c_uint;
+pub type ImGuiHoveredFlags_ = ::core::ffi::c_int;
 pub const ImGuiDockNodeFlags_None: ImGuiDockNodeFlags_ = 0;
 pub const ImGuiDockNodeFlags_KeepAliveOnly: ImGuiDockNodeFlags_ = 1;
 pub const ImGuiDockNodeFlags_NoDockingOverCentralNode: ImGuiDockNodeFlags_ = 4;
@@ -537,7 +491,7 @@ pub const ImGuiDockNodeFlags_NoDockingSplit: ImGuiDockNodeFlags_ = 16;
 pub const ImGuiDockNodeFlags_NoResize: ImGuiDockNodeFlags_ = 32;
 pub const ImGuiDockNodeFlags_AutoHideTabBar: ImGuiDockNodeFlags_ = 64;
 pub const ImGuiDockNodeFlags_NoUndocking: ImGuiDockNodeFlags_ = 128;
-pub type ImGuiDockNodeFlags_ = ::core::ffi::c_uint;
+pub type ImGuiDockNodeFlags_ = ::core::ffi::c_int;
 pub const ImGuiDragDropFlags_None: ImGuiDragDropFlags_ = 0;
 pub const ImGuiDragDropFlags_SourceNoPreviewTooltip: ImGuiDragDropFlags_ = 1;
 pub const ImGuiDragDropFlags_SourceNoDisableHover: ImGuiDragDropFlags_ = 2;
@@ -552,7 +506,7 @@ pub const ImGuiDragDropFlags_AcceptNoDrawDefaultRect: ImGuiDragDropFlags_ = 2048
 pub const ImGuiDragDropFlags_AcceptNoPreviewTooltip: ImGuiDragDropFlags_ = 4096;
 pub const ImGuiDragDropFlags_AcceptDrawAsHovered: ImGuiDragDropFlags_ = 8192;
 pub const ImGuiDragDropFlags_AcceptPeekOnly: ImGuiDragDropFlags_ = 3072;
-pub type ImGuiDragDropFlags_ = ::core::ffi::c_uint;
+pub type ImGuiDragDropFlags_ = ::core::ffi::c_int;
 pub const ImGuiDataType_S8: ImGuiDataType_ = 0;
 pub const ImGuiDataType_U8: ImGuiDataType_ = 1;
 pub const ImGuiDataType_S16: ImGuiDataType_ = 2;
@@ -566,7 +520,7 @@ pub const ImGuiDataType_Double: ImGuiDataType_ = 9;
 pub const ImGuiDataType_Bool: ImGuiDataType_ = 10;
 pub const ImGuiDataType_String: ImGuiDataType_ = 11;
 pub const ImGuiDataType_COUNT: ImGuiDataType_ = 12;
-pub type ImGuiDataType_ = ::core::ffi::c_uint;
+pub type ImGuiDataType_ = ::core::ffi::c_int;
 pub const ImGuiDir_None: ImGuiDir = -1;
 pub const ImGuiDir_Left: ImGuiDir = 0;
 pub const ImGuiDir_Right: ImGuiDir = 1;
@@ -577,7 +531,7 @@ pub type ImGuiDir = ::core::ffi::c_int;
 pub const ImGuiSortDirection_None: ImGuiSortDirection = 0;
 pub const ImGuiSortDirection_Ascending: ImGuiSortDirection = 1;
 pub const ImGuiSortDirection_Descending: ImGuiSortDirection = 2;
-pub type ImGuiSortDirection = ::core::ffi::c_uint;
+pub type ImGuiSortDirection = ::core::ffi::c_int;
 pub const ImGuiKey_None: ImGuiKey = 0;
 pub const ImGuiKey_NamedKey_BEGIN: ImGuiKey = 512;
 pub const ImGuiKey_Tab: ImGuiKey = 512;
@@ -743,7 +697,7 @@ pub const ImGuiMod_Shift: ImGuiKey = 8192;
 pub const ImGuiMod_Alt: ImGuiKey = 16384;
 pub const ImGuiMod_Super: ImGuiKey = 32768;
 pub const ImGuiMod_Mask_: ImGuiKey = 61440;
-pub type ImGuiKey = ::core::ffi::c_uint;
+pub type ImGuiKey = ::core::ffi::c_int;
 pub const ImGuiInputFlags_None: ImGuiInputFlags_ = 0;
 pub const ImGuiInputFlags_Repeat: ImGuiInputFlags_ = 1;
 pub const ImGuiInputFlags_RouteActive: ImGuiInputFlags_ = 1024;
@@ -755,7 +709,7 @@ pub const ImGuiInputFlags_RouteOverActive: ImGuiInputFlags_ = 32768;
 pub const ImGuiInputFlags_RouteUnlessBgFocused: ImGuiInputFlags_ = 65536;
 pub const ImGuiInputFlags_RouteFromRootWindow: ImGuiInputFlags_ = 131072;
 pub const ImGuiInputFlags_Tooltip: ImGuiInputFlags_ = 262144;
-pub type ImGuiInputFlags_ = ::core::ffi::c_uint;
+pub type ImGuiInputFlags_ = ::core::ffi::c_int;
 pub const ImGuiConfigFlags_None: ImGuiConfigFlags_ = 0;
 pub const ImGuiConfigFlags_NavEnableKeyboard: ImGuiConfigFlags_ = 1;
 pub const ImGuiConfigFlags_NavEnableGamepad: ImGuiConfigFlags_ = 2;
@@ -766,7 +720,7 @@ pub const ImGuiConfigFlags_DockingEnable: ImGuiConfigFlags_ = 128;
 pub const ImGuiConfigFlags_ViewportsEnable: ImGuiConfigFlags_ = 1024;
 pub const ImGuiConfigFlags_IsSRGB: ImGuiConfigFlags_ = 1048576;
 pub const ImGuiConfigFlags_IsTouchScreen: ImGuiConfigFlags_ = 2097152;
-pub type ImGuiConfigFlags_ = ::core::ffi::c_uint;
+pub type ImGuiConfigFlags_ = ::core::ffi::c_int;
 pub const ImGuiBackendFlags_None: ImGuiBackendFlags_ = 0;
 pub const ImGuiBackendFlags_HasGamepad: ImGuiBackendFlags_ = 1;
 pub const ImGuiBackendFlags_HasMouseCursors: ImGuiBackendFlags_ = 2;
@@ -777,7 +731,7 @@ pub const ImGuiBackendFlags_RendererHasViewports: ImGuiBackendFlags_ = 1024;
 pub const ImGuiBackendFlags_PlatformHasViewports: ImGuiBackendFlags_ = 2048;
 pub const ImGuiBackendFlags_HasMouseHoveredViewport: ImGuiBackendFlags_ = 4096;
 pub const ImGuiBackendFlags_HasParentViewport: ImGuiBackendFlags_ = 8192;
-pub type ImGuiBackendFlags_ = ::core::ffi::c_uint;
+pub type ImGuiBackendFlags_ = ::core::ffi::c_int;
 pub const ImGuiCol_Text: ImGuiCol_ = 0;
 pub const ImGuiCol_TextDisabled: ImGuiCol_ = 1;
 pub const ImGuiCol_WindowBg: ImGuiCol_ = 2;
@@ -842,7 +796,7 @@ pub const ImGuiCol_NavWindowingHighlight: ImGuiCol_ = 60;
 pub const ImGuiCol_NavWindowingDimBg: ImGuiCol_ = 61;
 pub const ImGuiCol_ModalWindowDimBg: ImGuiCol_ = 62;
 pub const ImGuiCol_COUNT: ImGuiCol_ = 63;
-pub type ImGuiCol_ = ::core::ffi::c_uint;
+pub type ImGuiCol_ = ::core::ffi::c_int;
 pub const ImGuiStyleVar_Alpha: ImGuiStyleVar_ = 0;
 pub const ImGuiStyleVar_DisabledAlpha: ImGuiStyleVar_ = 1;
 pub const ImGuiStyleVar_WindowPadding: ImGuiStyleVar_ = 2;
@@ -889,7 +843,7 @@ pub const ImGuiStyleVar_SeparatorTextAlign: ImGuiStyleVar_ = 42;
 pub const ImGuiStyleVar_SeparatorTextPadding: ImGuiStyleVar_ = 43;
 pub const ImGuiStyleVar_DockingSeparatorSize: ImGuiStyleVar_ = 44;
 pub const ImGuiStyleVar_COUNT: ImGuiStyleVar_ = 45;
-pub type ImGuiStyleVar_ = ::core::ffi::c_uint;
+pub type ImGuiStyleVar_ = ::core::ffi::c_int;
 pub const ImGuiButtonFlags_None: ImGuiButtonFlags_ = 0;
 pub const ImGuiButtonFlags_MouseButtonLeft: ImGuiButtonFlags_ = 1;
 pub const ImGuiButtonFlags_MouseButtonRight: ImGuiButtonFlags_ = 2;
@@ -897,7 +851,7 @@ pub const ImGuiButtonFlags_MouseButtonMiddle: ImGuiButtonFlags_ = 4;
 pub const ImGuiButtonFlags_MouseButtonMask_: ImGuiButtonFlags_ = 7;
 pub const ImGuiButtonFlags_EnableNav: ImGuiButtonFlags_ = 8;
 pub const ImGuiButtonFlags_AllowOverlap: ImGuiButtonFlags_ = 4096;
-pub type ImGuiButtonFlags_ = ::core::ffi::c_uint;
+pub type ImGuiButtonFlags_ = ::core::ffi::c_int;
 pub const ImGuiColorEditFlags_None: ImGuiColorEditFlags_ = 0;
 pub const ImGuiColorEditFlags_NoAlpha: ImGuiColorEditFlags_ = 2;
 pub const ImGuiColorEditFlags_NoPicker: ImGuiColorEditFlags_ = 4;
@@ -931,7 +885,7 @@ pub const ImGuiColorEditFlags_DisplayMask_: ImGuiColorEditFlags_ = 7340032;
 pub const ImGuiColorEditFlags_DataTypeMask_: ImGuiColorEditFlags_ = 25165824;
 pub const ImGuiColorEditFlags_PickerMask_: ImGuiColorEditFlags_ = 100663296;
 pub const ImGuiColorEditFlags_InputMask_: ImGuiColorEditFlags_ = 805306368;
-pub type ImGuiColorEditFlags_ = ::core::ffi::c_uint;
+pub type ImGuiColorEditFlags_ = ::core::ffi::c_int;
 pub const ImGuiSliderFlags_None: ImGuiSliderFlags_ = 0;
 pub const ImGuiSliderFlags_Logarithmic: ImGuiSliderFlags_ = 32;
 pub const ImGuiSliderFlags_NoRoundToFormat: ImGuiSliderFlags_ = 64;
@@ -943,12 +897,12 @@ pub const ImGuiSliderFlags_NoSpeedTweaks: ImGuiSliderFlags_ = 2048;
 pub const ImGuiSliderFlags_ColorMarkers: ImGuiSliderFlags_ = 4096;
 pub const ImGuiSliderFlags_AlwaysClamp: ImGuiSliderFlags_ = 1536;
 pub const ImGuiSliderFlags_InvalidMask_: ImGuiSliderFlags_ = 1879048207;
-pub type ImGuiSliderFlags_ = ::core::ffi::c_uint;
+pub type ImGuiSliderFlags_ = ::core::ffi::c_int;
 pub const ImGuiMouseButton_Left: ImGuiMouseButton_ = 0;
 pub const ImGuiMouseButton_Right: ImGuiMouseButton_ = 1;
 pub const ImGuiMouseButton_Middle: ImGuiMouseButton_ = 2;
 pub const ImGuiMouseButton_COUNT: ImGuiMouseButton_ = 5;
-pub type ImGuiMouseButton_ = ::core::ffi::c_uint;
+pub type ImGuiMouseButton_ = ::core::ffi::c_int;
 pub const ImGuiMouseCursor_None: ImGuiMouseCursor_ = -1;
 pub const ImGuiMouseCursor_Arrow: ImGuiMouseCursor_ = 0;
 pub const ImGuiMouseCursor_TextInput: ImGuiMouseCursor_ = 1;
@@ -967,13 +921,13 @@ pub const ImGuiMouseSource_Mouse: ImGuiMouseSource = 0;
 pub const ImGuiMouseSource_TouchScreen: ImGuiMouseSource = 1;
 pub const ImGuiMouseSource_Pen: ImGuiMouseSource = 2;
 pub const ImGuiMouseSource_COUNT: ImGuiMouseSource = 3;
-pub type ImGuiMouseSource = ::core::ffi::c_uint;
+pub type ImGuiMouseSource = ::core::ffi::c_int;
 pub const ImGuiCond_None: ImGuiCond_ = 0;
 pub const ImGuiCond_Always: ImGuiCond_ = 1;
 pub const ImGuiCond_Once: ImGuiCond_ = 2;
 pub const ImGuiCond_FirstUseEver: ImGuiCond_ = 4;
 pub const ImGuiCond_Appearing: ImGuiCond_ = 8;
-pub type ImGuiCond_ = ::core::ffi::c_uint;
+pub type ImGuiCond_ = ::core::ffi::c_int;
 pub const ImGuiTableFlags_None: ImGuiTableFlags_ = 0;
 pub const ImGuiTableFlags_Resizable: ImGuiTableFlags_ = 1;
 pub const ImGuiTableFlags_Reorderable: ImGuiTableFlags_ = 2;
@@ -1011,7 +965,7 @@ pub const ImGuiTableFlags_SortMulti: ImGuiTableFlags_ = 67108864;
 pub const ImGuiTableFlags_SortTristate: ImGuiTableFlags_ = 134217728;
 pub const ImGuiTableFlags_HighlightHoveredColumn: ImGuiTableFlags_ = 268435456;
 pub const ImGuiTableFlags_SizingMask_: ImGuiTableFlags_ = 57344;
-pub type ImGuiTableFlags_ = ::core::ffi::c_uint;
+pub type ImGuiTableFlags_ = ::core::ffi::c_int;
 pub const ImGuiTableColumnFlags_None: ImGuiTableColumnFlags_ = 0;
 pub const ImGuiTableColumnFlags_Disabled: ImGuiTableColumnFlags_ = 1;
 pub const ImGuiTableColumnFlags_DefaultHide: ImGuiTableColumnFlags_ = 2;
@@ -1040,15 +994,15 @@ pub const ImGuiTableColumnFlags_WidthMask_: ImGuiTableColumnFlags_ = 24;
 pub const ImGuiTableColumnFlags_IndentMask_: ImGuiTableColumnFlags_ = 196608;
 pub const ImGuiTableColumnFlags_StatusMask_: ImGuiTableColumnFlags_ = 251658240;
 pub const ImGuiTableColumnFlags_NoDirectResize_: ImGuiTableColumnFlags_ = 1073741824;
-pub type ImGuiTableColumnFlags_ = ::core::ffi::c_uint;
+pub type ImGuiTableColumnFlags_ = ::core::ffi::c_int;
 pub const ImGuiTableRowFlags_None: ImGuiTableRowFlags_ = 0;
 pub const ImGuiTableRowFlags_Headers: ImGuiTableRowFlags_ = 1;
-pub type ImGuiTableRowFlags_ = ::core::ffi::c_uint;
+pub type ImGuiTableRowFlags_ = ::core::ffi::c_int;
 pub const ImGuiTableBgTarget_None: ImGuiTableBgTarget_ = 0;
 pub const ImGuiTableBgTarget_RowBg0: ImGuiTableBgTarget_ = 1;
 pub const ImGuiTableBgTarget_RowBg1: ImGuiTableBgTarget_ = 2;
 pub const ImGuiTableBgTarget_CellBg: ImGuiTableBgTarget_ = 3;
-pub type ImGuiTableBgTarget_ = ::core::ffi::c_uint;
+pub type ImGuiTableBgTarget_ = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiTableSortSpecs {
@@ -1151,9 +1105,9 @@ pub struct ImGuiStyle {
     pub DockingSeparatorSize: f32,
     pub MouseCursorScale: f32,
     pub AntiAliasedLines: bool,
-    pub AntiAliasedLinesUseTex: bool,
+    pub AntiAliasedLineEnds: bool,
     pub AntiAliasedFill: bool,
-    pub CurveTessellationTol: f32,
+    pub CurveTessellationMaxError: f32,
     pub CircleTessellationMaxError: f32,
     pub Colors: [ImVec4_c; 63usize],
     pub HoverStationaryDelay: f32,
@@ -1262,6 +1216,7 @@ pub struct ImGuiIO {
     pub ConfigDebugBeginReturnValueOnce: bool,
     pub ConfigDebugBeginReturnValueLoop: bool,
     pub ConfigDebugIgnoreFocusLoss: bool,
+    pub ConfigDebugDrawListDefaultsToStrokeLegacy: bool,
     pub BackendPlatformName: *const ::core::ffi::c_char,
     pub BackendRendererName: *const ::core::ffi::c_char,
     pub BackendPlatformUserData: *mut ::core::ffi::c_void,
@@ -1422,27 +1377,12 @@ pub struct ImGuiOnceUponAFrame {
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImGuiTextRange {
-    pub b: *const ::core::ffi::c_char,
-    pub e: *const ::core::ffi::c_char,
-}
-impl Default for ImGuiTextRange {
-    fn default() -> Self {
-        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
-        }
-    }
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub struct ImVector_ImGuiTextRange {
+pub struct ImVector_ImGuiTextFilterItem {
     pub Size: ::core::ffi::c_int,
     pub Capacity: ::core::ffi::c_int,
-    pub Data: *mut ImGuiTextRange,
+    pub Data: *mut ImGuiTextFilterItem,
 }
-impl Default for ImVector_ImGuiTextRange {
+impl Default for ImVector_ImGuiTextFilterItem {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -1455,8 +1395,8 @@ impl Default for ImVector_ImGuiTextRange {
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiTextFilter {
     pub InputBuf: [::core::ffi::c_char; 256usize],
-    pub Filters: ImVector_ImGuiTextRange,
-    pub CountGrep: ::core::ffi::c_int,
+    pub _CountExclude: ::core::ffi::c_int,
+    pub _Items: ImVector_ImGuiTextFilterItem,
 }
 impl Default for ImGuiTextFilter {
     fn default() -> Self {
@@ -1574,7 +1514,7 @@ impl Default for ImGuiStorage {
 }
 pub const ImGuiListClipperFlags_None: ImGuiListClipperFlags_ = 0;
 pub const ImGuiListClipperFlags_NoSetTableRowCounters: ImGuiListClipperFlags_ = 1;
-pub type ImGuiListClipperFlags_ = ::core::ffi::c_uint;
+pub type ImGuiListClipperFlags_ = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiListClipper {
@@ -1624,7 +1564,7 @@ pub const ImGuiMultiSelectFlags_NavWrapX: ImGuiMultiSelectFlags_ = 65536;
 pub const ImGuiMultiSelectFlags_NoSelectOnRightClick: ImGuiMultiSelectFlags_ = 131072;
 pub const ImGuiMultiSelectFlags_SelectOnMask_: ImGuiMultiSelectFlags_ = 57344;
 pub const ImGuiMultiSelectFlags_CheckboxMode_: ImGuiMultiSelectFlags_ = 1048576;
-pub type ImGuiMultiSelectFlags_ = ::core::ffi::c_uint;
+pub type ImGuiMultiSelectFlags_ = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImGuiSelectionRequest {
@@ -1663,7 +1603,7 @@ impl Default for ImGuiMultiSelectIO {
 pub const ImGuiSelectionRequestType_None: ImGuiSelectionRequestType = 0;
 pub const ImGuiSelectionRequestType_SetAll: ImGuiSelectionRequestType = 1;
 pub const ImGuiSelectionRequestType_SetRange: ImGuiSelectionRequestType = 2;
-pub type ImGuiSelectionRequestType = ::core::ffi::c_uint;
+pub type ImGuiSelectionRequestType = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiSelectionRequest {
@@ -1960,28 +1900,37 @@ impl Default for ImDrawListSplitter {
     }
 }
 pub const ImDrawFlags_None: ImDrawFlags_ = 0;
-pub const ImDrawFlags_RoundCornersTopLeft: ImDrawFlags_ = 16;
-pub const ImDrawFlags_RoundCornersTopRight: ImDrawFlags_ = 32;
-pub const ImDrawFlags_RoundCornersBottomLeft: ImDrawFlags_ = 64;
-pub const ImDrawFlags_RoundCornersBottomRight: ImDrawFlags_ = 128;
-pub const ImDrawFlags_RoundCornersNone: ImDrawFlags_ = 256;
-pub const ImDrawFlags_RoundCornersAll: ImDrawFlags_ = 240;
-pub const ImDrawFlags_RoundCornersDefault_: ImDrawFlags_ = 240;
-pub const ImDrawFlags_RoundCornersTop: ImDrawFlags_ = 48;
-pub const ImDrawFlags_RoundCornersBottom: ImDrawFlags_ = 192;
-pub const ImDrawFlags_RoundCornersLeft: ImDrawFlags_ = 80;
-pub const ImDrawFlags_RoundCornersRight: ImDrawFlags_ = 160;
-pub const ImDrawFlags_RoundCornersMask_: ImDrawFlags_ = 496;
+pub const ImDrawFlags_RoundTopLeft: ImDrawFlags_ = 16;
+pub const ImDrawFlags_RoundTopRight: ImDrawFlags_ = 32;
+pub const ImDrawFlags_RoundBottomLeft: ImDrawFlags_ = 64;
+pub const ImDrawFlags_RoundBottomRight: ImDrawFlags_ = 128;
+pub const ImDrawFlags_RoundNone: ImDrawFlags_ = 256;
+pub const ImDrawFlags_RoundAll: ImDrawFlags_ = 240;
+pub const ImDrawFlags_RoundTop: ImDrawFlags_ = 48;
+pub const ImDrawFlags_RoundBottom: ImDrawFlags_ = 192;
+pub const ImDrawFlags_RoundLeft: ImDrawFlags_ = 80;
+pub const ImDrawFlags_RoundRight: ImDrawFlags_ = 160;
 pub const ImDrawFlags_Closed: ImDrawFlags_ = 512;
+pub const ImDrawFlags_JoinMiter: ImDrawFlags_ = 1024;
+pub const ImDrawFlags_CapSquare: ImDrawFlags_ = 2048;
+pub const ImDrawFlags_AAFill: ImDrawFlags_ = 4096;
+pub const ImDrawFlags_AALines: ImDrawFlags_ = 8192;
+pub const ImDrawFlags_AALineEnds: ImDrawFlags_ = 16384;
+pub const ImDrawFlags_StrokeInside: ImDrawFlags_ = 131072;
+pub const ImDrawFlags_StrokeCenter: ImDrawFlags_ = 262144;
+pub const ImDrawFlags_StrokeCenterBiased: ImDrawFlags_ = 393216;
+pub const ImDrawFlags_StrokeOutside: ImDrawFlags_ = 524288;
+pub const ImDrawFlags_StrokeLegacy: ImDrawFlags_ = 917504;
+pub const ImDrawFlags_TextNoPixelSnap: ImDrawFlags_ = 1048576;
+pub const ImDrawFlags_UseTexForRoundCorners: ImDrawFlags_ = 2097152;
+pub const ImDrawFlags_UseVtxOffset: ImDrawFlags_ = 4194304;
+pub const ImDrawFlags_AllowTexForRoundCorners_: ImDrawFlags_ = 8388608;
+pub const ImDrawFlags_RoundMask_: ImDrawFlags_ = 496;
+pub const ImDrawFlags_AllowInPushScope_: ImDrawFlags_ = 8286704;
+pub const ImDrawFlags_AllowInFrameScope_: ImDrawFlags_ = 16675312;
+pub const ImDrawFlags_StrokeMask_: ImDrawFlags_ = 917504;
 pub const ImDrawFlags_InvalidMask_: ImDrawFlags_ = -2147483633;
 pub type ImDrawFlags_ = ::core::ffi::c_int;
-pub const ImDrawListFlags_None: ImDrawListFlags_ = 0;
-pub const ImDrawListFlags_AntiAliasedLines: ImDrawListFlags_ = 1;
-pub const ImDrawListFlags_AntiAliasedLinesUseTex: ImDrawListFlags_ = 2;
-pub const ImDrawListFlags_AntiAliasedFill: ImDrawListFlags_ = 4;
-pub const ImDrawListFlags_AllowVtxOffset: ImDrawListFlags_ = 8;
-pub const ImDrawListFlags_TextNoPixelSnap: ImDrawListFlags_ = 16;
-pub type ImDrawListFlags_ = ::core::ffi::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImDrawVert {
@@ -2063,12 +2012,18 @@ impl Default for ImVector_ImU8 {
     }
 }
 #[repr(C)]
+#[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImSmallStack__ImDrawFlags__3 {
+    pub LocalData: [ImDrawFlags; 3usize],
+    pub Size: ImU16,
+}
+#[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImDrawList {
     pub CmdBuffer: ImVector_ImDrawCmd,
     pub IdxBuffer: ImVector_ImDrawIdx,
     pub VtxBuffer: ImVector_ImDrawVert,
-    pub Flags: ImDrawListFlags,
+    pub Flags: ImDrawFlags,
     pub _VtxCurrentIdx: ::core::ffi::c_uint,
     pub _Data: *mut ImDrawListSharedData,
     pub _VtxWritePtr: *mut ImDrawVert,
@@ -2079,7 +2034,10 @@ pub struct ImDrawList {
     pub _ClipRectStack: ImVector_ImVec4,
     pub _TextureStack: ImVector_ImTextureRef,
     pub _CallbacksDataBuf: ImVector_ImU8,
+    pub _DrawFlagsStack: ImSmallStack__ImDrawFlags__3,
     pub _FringeScale: f32,
+    pub _InvFringeScale: f32,
+    pub _FringeScaleIsInteger: bool,
     pub _OwnerName: *const ::core::ffi::c_char,
 }
 impl Default for ImDrawList {
@@ -2148,13 +2106,13 @@ impl Default for ImDrawData {
 }
 pub const ImTextureFormat_RGBA32: ImTextureFormat = 0;
 pub const ImTextureFormat_Alpha8: ImTextureFormat = 1;
-pub type ImTextureFormat = ::core::ffi::c_uint;
+pub type ImTextureFormat = ::core::ffi::c_int;
 pub const ImTextureStatus_OK: ImTextureStatus = 0;
 pub const ImTextureStatus_Destroyed: ImTextureStatus = 1;
 pub const ImTextureStatus_WantCreate: ImTextureStatus = 2;
 pub const ImTextureStatus_WantUpdates: ImTextureStatus = 3;
 pub const ImTextureStatus_WantDestroy: ImTextureStatus = 4;
-pub type ImTextureStatus = ::core::ffi::c_uint;
+pub type ImTextureStatus = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImTextureRect {
@@ -2468,7 +2426,8 @@ pub const ImFontAtlasFlags_None: ImFontAtlasFlags_ = 0;
 pub const ImFontAtlasFlags_NoPowerOfTwoHeight: ImFontAtlasFlags_ = 1;
 pub const ImFontAtlasFlags_NoMouseCursors: ImFontAtlasFlags_ = 2;
 pub const ImFontAtlasFlags_NoBakedLines: ImFontAtlasFlags_ = 4;
-pub type ImFontAtlasFlags_ = ::core::ffi::c_uint;
+pub const ImFontAtlasFlags_NoBakedRoundCorners: ImFontAtlasFlags_ = 8;
+pub type ImFontAtlasFlags_ = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImFontPtr {
@@ -2539,7 +2498,6 @@ pub struct ImFontAtlas {
     pub TexUvWhitePixel: ImVec2_c,
     pub Fonts: ImVector_ImFontPtr,
     pub Sources: ImVector_ImFontConfig,
-    pub TexUvLines: [ImVec4_c; 33usize],
     pub TexNextUniqueID: ::core::ffi::c_int,
     pub FontNextUniqueID: ::core::ffi::c_int,
     pub DrawListSharedDatas: ImVector_ImDrawListSharedDataPtr,
@@ -2801,7 +2759,7 @@ pub const ImFontFlags_NoLoadError: ImFontFlags_ = 2;
 pub const ImFontFlags_NoLoadGlyphs: ImFontFlags_ = 4;
 pub const ImFontFlags_LockBakedSizes: ImFontFlags_ = 8;
 pub const ImFontFlags_ImplicitRefSize: ImFontFlags_ = 16;
-pub type ImFontFlags_ = ::core::ffi::c_uint;
+pub type ImFontFlags_ = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImFontConfigPtr {
@@ -2858,7 +2816,7 @@ pub const ImGuiViewportFlags_TopMost: ImGuiViewportFlags_ = 1024;
 pub const ImGuiViewportFlags_CanHostOtherWindows: ImGuiViewportFlags_ = 2048;
 pub const ImGuiViewportFlags_IsMinimized: ImGuiViewportFlags_ = 4096;
 pub const ImGuiViewportFlags_IsFocused: ImGuiViewportFlags_ = 8192;
-pub type ImGuiViewportFlags_ = ::core::ffi::c_uint;
+pub type ImGuiViewportFlags_ = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiViewport {
@@ -2954,6 +2912,7 @@ pub struct ImGuiPlatformIO {
     pub DrawCallback_ResetRenderState: ImDrawCallback,
     pub DrawCallback_SetSamplerLinear: ImDrawCallback,
     pub DrawCallback_SetSamplerNearest: ImDrawCallback,
+    pub DrawCallback_SetSamplerFromTex: ImDrawCallback,
     pub Platform_CreateWindow: ::core::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport)>,
     pub Platform_DestroyWindow:
         ::core::option::Option<unsafe extern "C" fn(vp: *mut ImGuiViewport)>,
@@ -3051,6 +3010,7 @@ _ => false,
             && fn_opt_eq!(self.DrawCallback_ResetRenderState, other.DrawCallback_ResetRenderState)
             && fn_opt_eq!(self.DrawCallback_SetSamplerLinear, other.DrawCallback_SetSamplerLinear)
             && fn_opt_eq!(self.DrawCallback_SetSamplerNearest, other.DrawCallback_SetSamplerNearest)
+            && fn_opt_eq!(self.DrawCallback_SetSamplerFromTex, other.DrawCallback_SetSamplerFromTex)
             && fn_opt_eq!(self.Platform_CreateWindow, other.Platform_CreateWindow)
             && fn_opt_eq!(self.Platform_DestroyWindow, other.Platform_DestroyWindow)
             && fn_opt_eq!(self.Platform_ShowWindow, other.Platform_ShowWindow)
@@ -3111,6 +3071,7 @@ None => 0,
         fn_opt_hash!(self.DrawCallback_ResetRenderState, state);
         fn_opt_hash!(self.DrawCallback_SetSamplerLinear, state);
         fn_opt_hash!(self.DrawCallback_SetSamplerNearest, state);
+        fn_opt_hash!(self.DrawCallback_SetSamplerFromTex, state);
         fn_opt_hash!(self.Platform_CreateWindow, state);
         fn_opt_hash!(self.Platform_DestroyWindow, state);
         fn_opt_hash!(self.Platform_ShowWindow, state);
@@ -3194,11 +3155,11 @@ pub const ImDrawTextFlags_None: ImDrawTextFlags_ = 0;
 pub const ImDrawTextFlags_CpuFineClip: ImDrawTextFlags_ = 1;
 pub const ImDrawTextFlags_WrapKeepBlanks: ImDrawTextFlags_ = 2;
 pub const ImDrawTextFlags_StopOnNewLine: ImDrawTextFlags_ = 4;
-pub type ImDrawTextFlags_ = ::core::ffi::c_uint;
+pub type ImDrawTextFlags_ = ::core::ffi::c_int;
 pub const ImWcharClass_Blank: ImWcharClass = 0;
 pub const ImWcharClass_Punct: ImWcharClass = 1;
 pub const ImWcharClass_Other: ImWcharClass = 2;
-pub type ImWcharClass = ::core::ffi::c_uint;
+pub type ImWcharClass = ::core::ffi::c_int;
 pub type ImFileHandle = *mut FILE;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
@@ -3262,6 +3223,23 @@ pub struct ImGuiTextIndex {
     pub EndOffset: ::core::ffi::c_int,
 }
 impl Default for ImGuiTextIndex {
+    fn default() -> Self {
+        let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::core::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub struct ImGuiTextFilterItem {
+    pub Begin: *const ::core::ffi::c_char,
+    pub Len: ::core::ffi::c_int,
+    pub CountInclude: ::core::ffi::c_short,
+    pub MatchIncludesMask: ::core::ffi::c_ushort,
+}
+impl Default for ImGuiTextFilterItem {
     fn default() -> Self {
         let mut s = ::core::mem::MaybeUninit::<Self>::uninit();
         unsafe {
@@ -3404,14 +3382,14 @@ impl ImGuiPackedDate {
 pub struct ImDrawListSharedData {
     pub TexUvWhitePixel: ImVec2_c,
     pub TexUvLines: *const ImVec4_c,
+    pub TexUvCorners: *const ImVec4_c,
     pub FontAtlas: *mut ImFontAtlas,
     pub Font: *mut ImFont,
     pub FontSize: f32,
     pub FontScale: f32,
-    pub CurveTessellationTol: f32,
+    pub CurveTessellationMaxError: f32,
     pub CircleTessellationMaxError: f32,
-    pub InitialFringeScale: f32,
-    pub InitialFlags: ImDrawListFlags,
+    pub InitialDrawFlags: ImDrawFlags,
     pub ClipRectFullscreen: ImVec4_c,
     pub TempBuffer: ImVector_ImVec2,
     pub DrawLists: ImVector_ImDrawListPtr,
@@ -3663,9 +3641,8 @@ impl Default for ImGuiDataTypeInfo {
 }
 pub const ImGuiDataType_Pointer: ImGuiDataTypePrivate_ = 12;
 pub const ImGuiDataType_ID: ImGuiDataTypePrivate_ = 13;
-pub type ImGuiDataTypePrivate_ = ::core::ffi::c_uint;
+pub type ImGuiDataTypePrivate_ = ::core::ffi::c_int;
 pub const ImGuiItemFlags_ReadOnly: ImGuiItemFlagsPrivate_ = 2048;
-pub const ImGuiItemFlags_MixedValue: ImGuiItemFlagsPrivate_ = 4096;
 pub const ImGuiItemFlags_NoWindowHoverableCheck: ImGuiItemFlagsPrivate_ = 8192;
 pub const ImGuiItemFlags_AllowOverlap: ImGuiItemFlagsPrivate_ = 16384;
 pub const ImGuiItemFlags_NoNavDisableMouseHover: ImGuiItemFlagsPrivate_ = 32768;
@@ -3675,7 +3652,7 @@ pub const ImGuiItemFlags_Inputable: ImGuiItemFlagsPrivate_ = 1048576;
 pub const ImGuiItemFlags_HasSelectionUserData: ImGuiItemFlagsPrivate_ = 2097152;
 pub const ImGuiItemFlags_IsMultiSelect: ImGuiItemFlagsPrivate_ = 4194304;
 pub const ImGuiItemFlags_Default_: ImGuiItemFlagsPrivate_ = 144;
-pub type ImGuiItemFlagsPrivate_ = ::core::ffi::c_uint;
+pub type ImGuiItemFlagsPrivate_ = ::core::ffi::c_int;
 pub const ImGuiItemStatusFlags_None: ImGuiItemStatusFlags_ = 0;
 pub const ImGuiItemStatusFlags_HoveredRect: ImGuiItemStatusFlags_ = 1;
 pub const ImGuiItemStatusFlags_HasDisplayRect: ImGuiItemStatusFlags_ = 2;
@@ -3689,15 +3666,15 @@ pub const ImGuiItemStatusFlags_Visible: ImGuiItemStatusFlags_ = 256;
 pub const ImGuiItemStatusFlags_HasClipRect: ImGuiItemStatusFlags_ = 512;
 pub const ImGuiItemStatusFlags_HasShortcut: ImGuiItemStatusFlags_ = 1024;
 pub const ImGuiItemStatusFlags_EditedInternal: ImGuiItemStatusFlags_ = 2048;
-pub type ImGuiItemStatusFlags_ = ::core::ffi::c_uint;
+pub type ImGuiItemStatusFlags_ = ::core::ffi::c_int;
 pub const ImGuiHoveredFlags_DelayMask_: ImGuiHoveredFlagsPrivate_ = 245760;
 pub const ImGuiHoveredFlags_AllowedMaskForIsWindowHovered: ImGuiHoveredFlagsPrivate_ = 12479;
 pub const ImGuiHoveredFlags_AllowedMaskForIsItemHovered: ImGuiHoveredFlagsPrivate_ = 262048;
-pub type ImGuiHoveredFlagsPrivate_ = ::core::ffi::c_uint;
+pub type ImGuiHoveredFlagsPrivate_ = ::core::ffi::c_int;
 pub const ImGuiInputTextFlags_Multiline: ImGuiInputTextFlagsPrivate_ = 67108864;
 pub const ImGuiInputTextFlags_TempInput: ImGuiInputTextFlagsPrivate_ = 134217728;
 pub const ImGuiInputTextFlags_LocalizeDecimalPoint: ImGuiInputTextFlagsPrivate_ = 268435456;
-pub type ImGuiInputTextFlagsPrivate_ = ::core::ffi::c_uint;
+pub type ImGuiInputTextFlagsPrivate_ = ::core::ffi::c_int;
 pub const ImGuiButtonFlags_PressedOnClick: ImGuiButtonFlagsPrivate_ = 16;
 pub const ImGuiButtonFlags_PressedOnClickRelease: ImGuiButtonFlagsPrivate_ = 32;
 pub const ImGuiButtonFlags_PressedOnClickReleaseAnywhere: ImGuiButtonFlagsPrivate_ = 64;
@@ -3715,12 +3692,10 @@ pub const ImGuiButtonFlags_NoTestKeyOwner: ImGuiButtonFlagsPrivate_ = 2097152;
 pub const ImGuiButtonFlags_NoFocus: ImGuiButtonFlagsPrivate_ = 4194304;
 pub const ImGuiButtonFlags_PressedOnMask_: ImGuiButtonFlagsPrivate_ = 1008;
 pub const ImGuiButtonFlags_PressedOnDefault_: ImGuiButtonFlagsPrivate_ = 32;
-pub type ImGuiButtonFlagsPrivate_ = ::core::ffi::c_uint;
-pub const ImGuiComboFlags_CustomPreview: ImGuiComboFlagsPrivate_ = 1048576;
-pub type ImGuiComboFlagsPrivate_ = ::core::ffi::c_uint;
+pub type ImGuiButtonFlagsPrivate_ = ::core::ffi::c_int;
 pub const ImGuiSliderFlags_Vertical: ImGuiSliderFlagsPrivate_ = 1048576;
 pub const ImGuiSliderFlags_ReadOnly: ImGuiSliderFlagsPrivate_ = 2097152;
-pub type ImGuiSliderFlagsPrivate_ = ::core::ffi::c_uint;
+pub type ImGuiSliderFlagsPrivate_ = ::core::ffi::c_int;
 pub const ImGuiSelectableFlags_NoHoldingActiveID: ImGuiSelectableFlagsPrivate_ = 1048576;
 pub const ImGuiSelectableFlags_SelectOnClick: ImGuiSelectableFlagsPrivate_ = 4194304;
 pub const ImGuiSelectableFlags_SelectOnRelease: ImGuiSelectableFlagsPrivate_ = 8388608;
@@ -3728,45 +3703,45 @@ pub const ImGuiSelectableFlags_SpanAvailWidth: ImGuiSelectableFlagsPrivate_ = 16
 pub const ImGuiSelectableFlags_SetNavIdOnHover: ImGuiSelectableFlagsPrivate_ = 33554432;
 pub const ImGuiSelectableFlags_NoPadWithHalfSpacing: ImGuiSelectableFlagsPrivate_ = 67108864;
 pub const ImGuiSelectableFlags_NoSetKeyOwner: ImGuiSelectableFlagsPrivate_ = 134217728;
-pub type ImGuiSelectableFlagsPrivate_ = ::core::ffi::c_uint;
+pub type ImGuiSelectableFlagsPrivate_ = ::core::ffi::c_int;
 pub const ImGuiTreeNodeFlags_NoNavFocus: ImGuiTreeNodeFlagsPrivate_ = 134217728;
 pub const ImGuiTreeNodeFlags_ClipLabelForTrailingButton: ImGuiTreeNodeFlagsPrivate_ = 268435456;
 pub const ImGuiTreeNodeFlags_UpsideDownArrow: ImGuiTreeNodeFlagsPrivate_ = 536870912;
 pub const ImGuiTreeNodeFlags_OpenOnMask_: ImGuiTreeNodeFlagsPrivate_ = 192;
 pub const ImGuiTreeNodeFlags_DrawLinesMask_: ImGuiTreeNodeFlagsPrivate_ = 1835008;
-pub type ImGuiTreeNodeFlagsPrivate_ = ::core::ffi::c_uint;
+pub type ImGuiTreeNodeFlagsPrivate_ = ::core::ffi::c_int;
 pub const ImGuiSeparatorFlags_None: ImGuiSeparatorFlags_ = 0;
 pub const ImGuiSeparatorFlags_Horizontal: ImGuiSeparatorFlags_ = 1;
 pub const ImGuiSeparatorFlags_Vertical: ImGuiSeparatorFlags_ = 2;
 pub const ImGuiSeparatorFlags_SpanAllColumns: ImGuiSeparatorFlags_ = 4;
-pub type ImGuiSeparatorFlags_ = ::core::ffi::c_uint;
+pub type ImGuiSeparatorFlags_ = ::core::ffi::c_int;
 pub const ImGuiFocusRequestFlags_None: ImGuiFocusRequestFlags_ = 0;
 pub const ImGuiFocusRequestFlags_RestoreFocusedChild: ImGuiFocusRequestFlags_ = 1;
 pub const ImGuiFocusRequestFlags_UnlessBelowModal: ImGuiFocusRequestFlags_ = 2;
-pub type ImGuiFocusRequestFlags_ = ::core::ffi::c_uint;
+pub type ImGuiFocusRequestFlags_ = ::core::ffi::c_int;
 pub const ImGuiTextFlags_None: ImGuiTextFlags_ = 0;
 pub const ImGuiTextFlags_NoWidthForLargeClippedText: ImGuiTextFlags_ = 1;
-pub type ImGuiTextFlags_ = ::core::ffi::c_uint;
+pub type ImGuiTextFlags_ = ::core::ffi::c_int;
 pub const ImGuiTooltipFlags_None: ImGuiTooltipFlags_ = 0;
 pub const ImGuiTooltipFlags_OverridePrevious: ImGuiTooltipFlags_ = 2;
-pub type ImGuiTooltipFlags_ = ::core::ffi::c_uint;
+pub type ImGuiTooltipFlags_ = ::core::ffi::c_int;
 pub const ImGuiLayoutType_Horizontal: ImGuiLayoutType_ = 0;
 pub const ImGuiLayoutType_Vertical: ImGuiLayoutType_ = 1;
-pub type ImGuiLayoutType_ = ::core::ffi::c_uint;
+pub type ImGuiLayoutType_ = ::core::ffi::c_int;
 pub const ImGuiLogFlags_None: ImGuiLogFlags_ = 0;
 pub const ImGuiLogFlags_OutputTTY: ImGuiLogFlags_ = 1;
 pub const ImGuiLogFlags_OutputFile: ImGuiLogFlags_ = 2;
 pub const ImGuiLogFlags_OutputBuffer: ImGuiLogFlags_ = 4;
 pub const ImGuiLogFlags_OutputClipboard: ImGuiLogFlags_ = 8;
 pub const ImGuiLogFlags_OutputMask_: ImGuiLogFlags_ = 15;
-pub type ImGuiLogFlags_ = ::core::ffi::c_uint;
+pub type ImGuiLogFlags_ = ::core::ffi::c_int;
 pub const ImGuiAxis_None: ImGuiAxis = -1;
 pub const ImGuiAxis_X: ImGuiAxis = 0;
 pub const ImGuiAxis_Y: ImGuiAxis = 1;
 pub type ImGuiAxis = ::core::ffi::c_int;
 pub const ImGuiPlotType_Lines: ImGuiPlotType = 0;
 pub const ImGuiPlotType_Histogram: ImGuiPlotType = 1;
-pub type ImGuiPlotType = ::core::ffi::c_uint;
+pub type ImGuiPlotType = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct ImGuiComboPreviewData {
@@ -3775,7 +3750,95 @@ pub struct ImGuiComboPreviewData {
     pub BackupCursorMaxPos: ImVec2_c,
     pub BackupCursorPosPrevLine: ImVec2_c,
     pub BackupPrevLineTextBaseOffset: f32,
-    pub BackupLayout: ImGuiLayoutType,
+    pub BackupWorkRectMaxX: f32,
+    pub BackupContentRectMaxX: f32,
+    pub _bitfield_align_1: [u8; 0],
+    pub _bitfield_1: __BindgenBitfieldUnit<[u8; 2usize]>,
+    pub __bindgen_padding_0: u16,
+}
+impl ImGuiComboPreviewData {
+    #[inline]
+    pub fn BackupLayout(&self) -> ImGuiLayoutType {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(0usize, 8u8) as u32) }
+    }
+    #[inline]
+    pub fn set_BackupLayout(&mut self, val: ImGuiLayoutType) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(0usize, 8u8, val as u64)
+        }
+    }
+    #[inline]
+    pub unsafe fn BackupLayout_raw(this: *const Self) -> ImGuiLayoutType {
+        unsafe {
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 2usize]>>::raw_get(
+                ::core::ptr::addr_of!((*this)._bitfield_1),
+                0usize,
+                8u8,
+            ) as u32)
+        }
+    }
+    #[inline]
+    pub unsafe fn set_BackupLayout_raw(this: *mut Self, val: ImGuiLayoutType) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            <__BindgenBitfieldUnit<[u8; 2usize]>>::raw_set(
+                ::core::ptr::addr_of_mut!((*this)._bitfield_1),
+                0usize,
+                8u8,
+                val as u64,
+            )
+        }
+    }
+    #[inline]
+    pub fn WithinPreview(&self) -> ::core::ffi::c_int {
+        unsafe { ::core::mem::transmute(self._bitfield_1.get(8usize, 2u8) as u32) }
+    }
+    #[inline]
+    pub fn set_WithinPreview(&mut self, val: ::core::ffi::c_int) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            self._bitfield_1.set(8usize, 2u8, val as u64)
+        }
+    }
+    #[inline]
+    pub unsafe fn WithinPreview_raw(this: *const Self) -> ::core::ffi::c_int {
+        unsafe {
+            ::core::mem::transmute(<__BindgenBitfieldUnit<[u8; 2usize]>>::raw_get(
+                ::core::ptr::addr_of!((*this)._bitfield_1),
+                8usize,
+                2u8,
+            ) as u32)
+        }
+    }
+    #[inline]
+    pub unsafe fn set_WithinPreview_raw(this: *mut Self, val: ::core::ffi::c_int) {
+        unsafe {
+            let val: u32 = ::core::mem::transmute(val);
+            <__BindgenBitfieldUnit<[u8; 2usize]>>::raw_set(
+                ::core::ptr::addr_of_mut!((*this)._bitfield_1),
+                8usize,
+                2u8,
+                val as u64,
+            )
+        }
+    }
+    #[inline]
+    pub fn new_bitfield_1(
+        BackupLayout: ImGuiLayoutType,
+        WithinPreview: ::core::ffi::c_int,
+    ) -> __BindgenBitfieldUnit<[u8; 2usize]> {
+        let mut __bindgen_bitfield_unit: __BindgenBitfieldUnit<[u8; 2usize]> = Default::default();
+        __bindgen_bitfield_unit.set(0usize, 8u8, {
+            let BackupLayout: u32 = unsafe { ::core::mem::transmute(BackupLayout) };
+            BackupLayout as u64
+        });
+        __bindgen_bitfield_unit.set(8usize, 2u8, {
+            let WithinPreview: u32 = unsafe { ::core::mem::transmute(WithinPreview) };
+            WithinPreview as u64
+        });
+        __bindgen_bitfield_unit
+    }
 }
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
@@ -3846,6 +3909,7 @@ pub struct ImGuiInputTextState {
     pub SelectedAllMouseLock: bool,
     pub EditedBefore: bool,
     pub EditedThisFrame: bool,
+    pub ValidatedThisFrame: bool,
     pub WantReloadUserBuf: bool,
     pub LastMoveDirectionLR: ImS8,
     pub ReloadSelectionStart: ::core::ffi::c_int,
@@ -3864,10 +3928,10 @@ pub const ImGuiWindowRefreshFlags_None: ImGuiWindowRefreshFlags_ = 0;
 pub const ImGuiWindowRefreshFlags_TryToAvoidRefresh: ImGuiWindowRefreshFlags_ = 1;
 pub const ImGuiWindowRefreshFlags_RefreshOnHover: ImGuiWindowRefreshFlags_ = 2;
 pub const ImGuiWindowRefreshFlags_RefreshOnFocus: ImGuiWindowRefreshFlags_ = 4;
-pub type ImGuiWindowRefreshFlags_ = ::core::ffi::c_uint;
+pub type ImGuiWindowRefreshFlags_ = ::core::ffi::c_int;
 pub const ImGuiWindowBgClickFlags_None: ImGuiWindowBgClickFlags_ = 0;
 pub const ImGuiWindowBgClickFlags_Move: ImGuiWindowBgClickFlags_ = 1;
-pub type ImGuiWindowBgClickFlags_ = ::core::ffi::c_uint;
+pub type ImGuiWindowBgClickFlags_ = ::core::ffi::c_int;
 pub const ImGuiNextWindowDataFlags_None: ImGuiNextWindowDataFlags_ = 0;
 pub const ImGuiNextWindowDataFlags_HasPos: ImGuiNextWindowDataFlags_ = 1;
 pub const ImGuiNextWindowDataFlags_HasSize: ImGuiNextWindowDataFlags_ = 2;
@@ -3883,7 +3947,7 @@ pub const ImGuiNextWindowDataFlags_HasRefreshPolicy: ImGuiNextWindowDataFlags_ =
 pub const ImGuiNextWindowDataFlags_HasViewport: ImGuiNextWindowDataFlags_ = 2048;
 pub const ImGuiNextWindowDataFlags_HasDock: ImGuiNextWindowDataFlags_ = 4096;
 pub const ImGuiNextWindowDataFlags_HasWindowClass: ImGuiNextWindowDataFlags_ = 8192;
-pub type ImGuiNextWindowDataFlags_ = ::core::ffi::c_uint;
+pub type ImGuiNextWindowDataFlags_ = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiNextWindowData {
@@ -3897,8 +3961,10 @@ pub struct ImGuiNextWindowData {
     pub SizeVal: ImVec2_c,
     pub ContentSizeVal: ImVec2_c,
     pub ScrollVal: ImVec2_c,
-    pub WindowFlags: ImGuiWindowFlags,
-    pub ChildFlags: ImGuiChildFlags,
+    pub WindowFlagsSet: ImGuiWindowFlags,
+    pub WindowFlagsClear: ImGuiWindowFlags,
+    pub ChildFlagsSet: ImGuiChildFlags,
+    pub ChildFlagsClear: ImGuiChildFlags,
     pub PosUndock: bool,
     pub CollapsedVal: bool,
     pub SizeConstraintRect: ImRect_c,
@@ -3927,7 +3993,7 @@ pub const ImGuiNextItemDataFlags_HasShortcut: ImGuiNextItemDataFlags_ = 4;
 pub const ImGuiNextItemDataFlags_HasRefVal: ImGuiNextItemDataFlags_ = 8;
 pub const ImGuiNextItemDataFlags_HasStorageID: ImGuiNextItemDataFlags_ = 16;
 pub const ImGuiNextItemDataFlags_HasColorMarker: ImGuiNextItemDataFlags_ = 32;
-pub type ImGuiNextItemDataFlags_ = ::core::ffi::c_uint;
+pub type ImGuiNextItemDataFlags_ = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct ImGuiNextItemData {
@@ -3990,6 +4056,7 @@ pub struct ImGuiWindowStackData {
     pub StackSizesInBegin: ImGuiErrorRecoveryState,
     pub DisabledOverrideReenable: bool,
     pub DisabledOverrideReenableAlphaBackup: f32,
+    pub ParentLastComboPreviewRect: ImRect_c,
 }
 impl Default for ImGuiWindowStackData {
     fn default() -> Self {
@@ -4033,7 +4100,7 @@ pub struct ImGuiDeactivatedItemData {
 pub const ImGuiPopupPositionPolicy_Default: ImGuiPopupPositionPolicy = 0;
 pub const ImGuiPopupPositionPolicy_ComboBox: ImGuiPopupPositionPolicy = 1;
 pub const ImGuiPopupPositionPolicy_Tooltip: ImGuiPopupPositionPolicy = 2;
-pub type ImGuiPopupPositionPolicy = ::core::ffi::c_uint;
+pub type ImGuiPopupPositionPolicy = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiPopupData {
@@ -4070,13 +4137,13 @@ pub const ImGuiInputEventType_Key: ImGuiInputEventType = 5;
 pub const ImGuiInputEventType_Text: ImGuiInputEventType = 6;
 pub const ImGuiInputEventType_Focus: ImGuiInputEventType = 7;
 pub const ImGuiInputEventType_COUNT: ImGuiInputEventType = 8;
-pub type ImGuiInputEventType = ::core::ffi::c_uint;
+pub type ImGuiInputEventType = ::core::ffi::c_int;
 pub const ImGuiInputSource_None: ImGuiInputSource = 0;
 pub const ImGuiInputSource_Mouse: ImGuiInputSource = 1;
 pub const ImGuiInputSource_Keyboard: ImGuiInputSource = 2;
 pub const ImGuiInputSource_Gamepad: ImGuiInputSource = 3;
 pub const ImGuiInputSource_COUNT: ImGuiInputSource = 4;
-pub type ImGuiInputSource = ::core::ffi::c_uint;
+pub type ImGuiInputSource = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiInputEventMousePos {
@@ -4279,7 +4346,7 @@ pub const ImGuiInputFlags_SupportedByShortcut: ImGuiInputFlagsPrivate_ = 261375;
 pub const ImGuiInputFlags_SupportedBySetNextItemShortcut: ImGuiInputFlagsPrivate_ = 523519;
 pub const ImGuiInputFlags_SupportedBySetKeyOwner: ImGuiInputFlagsPrivate_ = 3145728;
 pub const ImGuiInputFlags_SupportedBySetItemKeyOwner: ImGuiInputFlagsPrivate_ = 15728640;
-pub type ImGuiInputFlagsPrivate_ = ::core::ffi::c_uint;
+pub type ImGuiInputFlagsPrivate_ = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiListClipperRange {
@@ -4330,7 +4397,7 @@ pub const ImGuiActivateFlags_TryToPreserveState: ImGuiActivateFlags_ = 4;
 pub const ImGuiActivateFlags_FromTabbing: ImGuiActivateFlags_ = 8;
 pub const ImGuiActivateFlags_FromShortcut: ImGuiActivateFlags_ = 16;
 pub const ImGuiActivateFlags_FromFocusApi: ImGuiActivateFlags_ = 32;
-pub type ImGuiActivateFlags_ = ::core::ffi::c_uint;
+pub type ImGuiActivateFlags_ = ::core::ffi::c_int;
 pub const ImGuiScrollFlags_None: ImGuiScrollFlags_ = 0;
 pub const ImGuiScrollFlags_KeepVisibleEdgeX: ImGuiScrollFlags_ = 1;
 pub const ImGuiScrollFlags_KeepVisibleEdgeY: ImGuiScrollFlags_ = 2;
@@ -4341,11 +4408,11 @@ pub const ImGuiScrollFlags_AlwaysCenterY: ImGuiScrollFlags_ = 32;
 pub const ImGuiScrollFlags_NoScrollParent: ImGuiScrollFlags_ = 64;
 pub const ImGuiScrollFlags_MaskX_: ImGuiScrollFlags_ = 21;
 pub const ImGuiScrollFlags_MaskY_: ImGuiScrollFlags_ = 42;
-pub type ImGuiScrollFlags_ = ::core::ffi::c_uint;
+pub type ImGuiScrollFlags_ = ::core::ffi::c_int;
 pub const ImGuiNavRenderCursorFlags_None: ImGuiNavRenderCursorFlags_ = 0;
 pub const ImGuiNavRenderCursorFlags_Compact: ImGuiNavRenderCursorFlags_ = 2;
 pub const ImGuiNavRenderCursorFlags_AlwaysDraw: ImGuiNavRenderCursorFlags_ = 4;
-pub type ImGuiNavRenderCursorFlags_ = ::core::ffi::c_uint;
+pub type ImGuiNavRenderCursorFlags_ = ::core::ffi::c_int;
 pub const ImGuiNavMoveFlags_None: ImGuiNavMoveFlags_ = 0;
 pub const ImGuiNavMoveFlags_LoopX: ImGuiNavMoveFlags_ = 1;
 pub const ImGuiNavMoveFlags_LoopY: ImGuiNavMoveFlags_ = 2;
@@ -4364,11 +4431,11 @@ pub const ImGuiNavMoveFlags_Activate: ImGuiNavMoveFlags_ = 4096;
 pub const ImGuiNavMoveFlags_NoSelect: ImGuiNavMoveFlags_ = 8192;
 pub const ImGuiNavMoveFlags_NoSetNavCursorVisible: ImGuiNavMoveFlags_ = 16384;
 pub const ImGuiNavMoveFlags_NoClearActiveId: ImGuiNavMoveFlags_ = 32768;
-pub type ImGuiNavMoveFlags_ = ::core::ffi::c_uint;
+pub type ImGuiNavMoveFlags_ = ::core::ffi::c_int;
 pub const ImGuiNavLayer_Main: ImGuiNavLayer = 0;
 pub const ImGuiNavLayer_Menu: ImGuiNavLayer = 1;
 pub const ImGuiNavLayer_COUNT: ImGuiNavLayer = 2;
-pub type ImGuiNavLayer = ::core::ffi::c_uint;
+pub type ImGuiNavLayer = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiNavItemData {
@@ -4400,7 +4467,7 @@ pub struct ImGuiFocusScopeData {
 pub const ImGuiTypingSelectFlags_None: ImGuiTypingSelectFlags_ = 0;
 pub const ImGuiTypingSelectFlags_AllowBackspace: ImGuiTypingSelectFlags_ = 1;
 pub const ImGuiTypingSelectFlags_AllowSingleCharMode: ImGuiTypingSelectFlags_ = 2;
-pub type ImGuiTypingSelectFlags_ = ::core::ffi::c_uint;
+pub type ImGuiTypingSelectFlags_ = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiTypingSelectRequest {
@@ -4445,7 +4512,7 @@ pub const ImGuiOldColumnFlags_NoResize: ImGuiOldColumnFlags_ = 2;
 pub const ImGuiOldColumnFlags_NoPreserveWidths: ImGuiOldColumnFlags_ = 4;
 pub const ImGuiOldColumnFlags_NoForceWithinWindow: ImGuiOldColumnFlags_ = 8;
 pub const ImGuiOldColumnFlags_GrowParentContentsSize: ImGuiOldColumnFlags_ = 16;
-pub type ImGuiOldColumnFlags_ = ::core::ffi::c_uint;
+pub type ImGuiOldColumnFlags_ = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct ImGuiOldColumnData {
@@ -4511,6 +4578,7 @@ pub struct ImGuiBoxSelectState {
     pub RequestClear: bool,
     pub _bitfield_align_1: [u16; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 2usize]>,
+    pub __bindgen_padding_0: u32,
     pub StartPosRel: ImVec2_c,
     pub EndPosRel: ImVec2_c,
     pub ScrollAccum: ImVec2_c,
@@ -4646,12 +4714,12 @@ pub type ImGuiDockNodeFlagsPrivate_ = ::core::ffi::c_int;
 pub const ImGuiDataAuthority_Auto: ImGuiDataAuthority_ = 0;
 pub const ImGuiDataAuthority_DockNode: ImGuiDataAuthority_ = 1;
 pub const ImGuiDataAuthority_Window: ImGuiDataAuthority_ = 2;
-pub type ImGuiDataAuthority_ = ::core::ffi::c_uint;
+pub type ImGuiDataAuthority_ = ::core::ffi::c_int;
 pub const ImGuiDockNodeState_Unknown: ImGuiDockNodeState = 0;
 pub const ImGuiDockNodeState_HostWindowHiddenBecauseSingleWindow: ImGuiDockNodeState = 1;
 pub const ImGuiDockNodeState_HostWindowHiddenBecauseWindowsAreResizing: ImGuiDockNodeState = 2;
 pub const ImGuiDockNodeState_HostWindowVisible: ImGuiDockNodeState = 3;
-pub type ImGuiDockNodeState = ::core::ffi::c_uint;
+pub type ImGuiDockNodeState = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImVector_ImGuiWindowPtr {
@@ -5264,7 +5332,7 @@ pub const ImGuiWindowDockStyleCol_TabDimmedSelected: ImGuiWindowDockStyleCol = 6
 pub const ImGuiWindowDockStyleCol_TabDimmedSelectedOverline: ImGuiWindowDockStyleCol = 7;
 pub const ImGuiWindowDockStyleCol_UnsavedMarker: ImGuiWindowDockStyleCol = 8;
 pub const ImGuiWindowDockStyleCol_COUNT: ImGuiWindowDockStyleCol = 9;
-pub type ImGuiWindowDockStyleCol = ::core::ffi::c_uint;
+pub type ImGuiWindowDockStyleCol = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiWindowDockStyle {
@@ -5334,8 +5402,9 @@ pub struct ImGuiViewportP {
     pub LastAlpha: f32,
     pub LastFocusedHadNavWindow: bool,
     pub PlatformMonitor: ::core::ffi::c_short,
-    pub BgFgDrawListsLastTimeActive: [f32; 2usize],
     pub BgFgDrawLists: [*mut ImDrawList; 2usize],
+    pub BgFgDrawListsLastFrameActive: [::core::ffi::c_int; 2usize],
+    pub BgFgDrawListsLastTimeActive: [f32; 2usize],
     pub DrawDataP: ImDrawData,
     pub DrawDataBuilder: ImDrawDataBuilder,
     pub LastPlatformPos: ImVec2_c,
@@ -5605,7 +5674,7 @@ pub const ImGuiLocKey_DockingHideTabBar: ImGuiLocKey = 12;
 pub const ImGuiLocKey_DockingHoldShiftToDock: ImGuiLocKey = 13;
 pub const ImGuiLocKey_DockingDragToUndockOrMoveNode: ImGuiLocKey = 14;
 pub const ImGuiLocKey_COUNT: ImGuiLocKey = 15;
-pub type ImGuiLocKey = ::core::ffi::c_uint;
+pub type ImGuiLocKey = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiLocEntry {
@@ -5646,7 +5715,7 @@ pub const ImGuiDebugLogFlags_EventMask_: ImGuiDebugLogFlags_ = 8191;
 pub const ImGuiDebugLogFlags_OutputToTTY: ImGuiDebugLogFlags_ = 1048576;
 pub const ImGuiDebugLogFlags_OutputToDebugger: ImGuiDebugLogFlags_ = 2097152;
 pub const ImGuiDebugLogFlags_OutputToTestEngine: ImGuiDebugLogFlags_ = 4194304;
-pub type ImGuiDebugLogFlags_ = ::core::ffi::c_uint;
+pub type ImGuiDebugLogFlags_ = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiDebugAllocEntry {
@@ -5747,7 +5816,7 @@ pub const ImGuiContextHookType_RenderPre: ImGuiContextHookType = 4;
 pub const ImGuiContextHookType_RenderPost: ImGuiContextHookType = 5;
 pub const ImGuiContextHookType_Shutdown: ImGuiContextHookType = 6;
 pub const ImGuiContextHookType_PendingRemoval_: ImGuiContextHookType = 7;
-pub type ImGuiContextHookType = ::core::ffi::c_uint;
+pub type ImGuiContextHookType = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub struct ImGuiContextHook {
@@ -6260,7 +6329,7 @@ pub struct ImGuiContext {
     pub FontSize: f32,
     pub FontSizeBase: f32,
     pub FontBakedScale: f32,
-    pub FontRasterizerDensity: f32,
+    pub CurrentPixelDensity: f32,
     pub CurrentDpiScale: f32,
     pub DrawListSharedData: ImDrawListSharedData,
     pub WithinEndChildID: ImGuiID,
@@ -6290,6 +6359,7 @@ pub struct ImGuiContext {
     pub WheelingWindowReleaseTimer: f32,
     pub WheelingWindowWheelRemainder: ImVec2_c,
     pub WheelingAxisAvg: ImVec2_c,
+    pub MixedValueLabel: *const ::core::ffi::c_char,
     pub DebugDrawIdConflictsId: ImGuiID,
     pub DebugHookIdInfoId: ImGuiID,
     pub HoveredId: ImGuiID,
@@ -6412,6 +6482,7 @@ pub struct ImGuiContext {
     pub NavJustMovedToFocusScopeId: ImGuiID,
     pub NavJustMovedToKeyMods: ImGuiKeyChord,
     pub NavJustMovedToIsTabbing: bool,
+    pub NavJustMovedToIsInit: bool,
     pub NavJustMovedToHasSelectionData: bool,
     pub ConfigNavEnableTabbing: bool,
     pub ConfigNavWindowingWithGamepad: bool,
@@ -6738,6 +6809,7 @@ pub struct ImGuiWindow {
     pub DisableInputsFrames: ImS8,
     pub _bitfield_align_1: [u8; 0],
     pub _bitfield_1: __BindgenBitfieldUnit<[u8; 5usize]>,
+    pub __bindgen_padding_0: u32,
     pub SetWindowPosVal: ImVec2_c,
     pub SetWindowPosPivot: ImVec2_c,
     pub IDStack: ImVector_ImGuiID,
@@ -7158,13 +7230,13 @@ impl ImGuiWindow {
 pub const ImGuiTabBarFlags_DockNode: ImGuiTabBarFlagsPrivate_ = 1048576;
 pub const ImGuiTabBarFlags_IsFocused: ImGuiTabBarFlagsPrivate_ = 2097152;
 pub const ImGuiTabBarFlags_SaveSettings: ImGuiTabBarFlagsPrivate_ = 4194304;
-pub type ImGuiTabBarFlagsPrivate_ = ::core::ffi::c_uint;
+pub type ImGuiTabBarFlagsPrivate_ = ::core::ffi::c_int;
 pub const ImGuiTabItemFlags_SectionMask_: ImGuiTabItemFlagsPrivate_ = 192;
 pub const ImGuiTabItemFlags_NoCloseButton: ImGuiTabItemFlagsPrivate_ = 1048576;
 pub const ImGuiTabItemFlags_Button: ImGuiTabItemFlagsPrivate_ = 2097152;
 pub const ImGuiTabItemFlags_Invisible: ImGuiTabItemFlagsPrivate_ = 4194304;
 pub const ImGuiTabItemFlags_Unsorted: ImGuiTabItemFlagsPrivate_ = 8388608;
-pub type ImGuiTabItemFlagsPrivate_ = ::core::ffi::c_uint;
+pub type ImGuiTabItemFlagsPrivate_ = ::core::ffi::c_int;
 #[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImGuiTabItem {
@@ -7876,9 +7948,9 @@ pub struct ImGuiTable {
     pub DrawSplitter: *mut ImDrawListSplitter,
     pub InstanceDataFirst: ImGuiTableInstanceData,
     pub InstanceDataExtra: ImVector_ImGuiTableInstanceData,
-    pub SortSpecsSingle: ImGuiTableColumnSortSpecs,
-    pub SortSpecsMulti: ImVector_ImGuiTableColumnSortSpecs,
     pub SortSpecs: ImGuiTableSortSpecs,
+    pub SortSpecsMulti: ImVector_ImGuiTableColumnSortSpecs,
+    pub SortSpecsSingle: ImGuiTableColumnSortSpecs,
     pub SortSpecsCount: ImGuiTableColumnIdx,
     pub ColumnsEnabledCount: ImGuiTableColumnIdx,
     pub ColumnsEnabledFixedCount: ImGuiTableColumnIdx,
@@ -7910,6 +7982,7 @@ pub struct ImGuiTable {
     pub NavLayer: ImS8,
     pub IsLayoutLocked: bool,
     pub IsInsideRow: bool,
+    pub IsNewTable: bool,
     pub IsInitializing: bool,
     pub IsReconcileMode: bool,
     pub IsSortSpecsDirty: bool,
@@ -8329,11 +8402,18 @@ pub struct ImFontLoader {
     pub FontSrcDestroy: ::core::option::Option<
         unsafe extern "C" fn(atlas: *mut ImFontAtlas, src: *mut ImFontConfig),
     >,
-    pub FontSrcContainsGlyph: ::core::option::Option<
+    pub FontSrcGetGlyphIndexFromCodepoint: ::core::option::Option<
         unsafe extern "C" fn(
             atlas: *mut ImFontAtlas,
             src: *mut ImFontConfig,
             codepoint: ImWchar,
+        ) -> ::core::ffi::c_int,
+    >,
+    pub FontSrcContainsGlyph: ::core::option::Option<
+        unsafe extern "C" fn(
+            atlas: *mut ImFontAtlas,
+            src: *mut ImFontConfig,
+            glyph_index: ::core::ffi::c_int,
         ) -> bool,
     >,
     pub FontBakedInit: ::core::option::Option<
@@ -8358,7 +8438,7 @@ pub struct ImFontLoader {
             src: *mut ImFontConfig,
             baked: *mut ImFontBaked,
             loader_data_for_baked_src: *mut ::core::ffi::c_void,
-            codepoint: ImWchar,
+            glyph_index: ::core::ffi::c_int,
             out_glyph: *mut ImFontGlyph,
             out_advance_x: *mut f32,
         ) -> bool,
@@ -8391,6 +8471,7 @@ _ => false,
             && fn_opt_eq!(self.LoaderShutdown, other.LoaderShutdown)
             && fn_opt_eq!(self.FontSrcInit, other.FontSrcInit)
             && fn_opt_eq!(self.FontSrcDestroy, other.FontSrcDestroy)
+            && fn_opt_eq!(self.FontSrcGetGlyphIndexFromCodepoint, other.FontSrcGetGlyphIndexFromCodepoint)
             && fn_opt_eq!(self.FontSrcContainsGlyph, other.FontSrcContainsGlyph)
             && fn_opt_eq!(self.FontBakedInit, other.FontBakedInit)
             && fn_opt_eq!(self.FontBakedDestroy, other.FontBakedDestroy)
@@ -8418,6 +8499,7 @@ None => 0,
         fn_opt_hash!(self.LoaderShutdown, state);
         fn_opt_hash!(self.FontSrcInit, state);
         fn_opt_hash!(self.FontSrcDestroy, state);
+        fn_opt_hash!(self.FontSrcGetGlyphIndexFromCodepoint, state);
         fn_opt_hash!(self.FontSrcContainsGlyph, state);
         fn_opt_hash!(self.FontBakedInit, state);
         fn_opt_hash!(self.FontBakedDestroy, state);
@@ -8657,7 +8739,7 @@ impl Default for ImStableVector_ImFontBaked__32 {
     }
 }
 #[repr(C)]
-#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct ImFontAtlasBuilder {
     pub PackContext: stbrp_context_opaque,
     pub PackNodes: ImVector_stbrp_node_im,
@@ -8679,6 +8761,10 @@ pub struct ImFontAtlasBuilder {
     pub BakedDiscardedCount: ::core::ffi::c_int,
     pub PackIdMouseCursors: ImFontAtlasRectId,
     pub PackIdLinesTexData: ImFontAtlasRectId,
+    pub PackIdLineFractTexData: ImFontAtlasRectId,
+    pub PackIdCornersTexData: ImFontAtlasRectId,
+    pub TexUvLines: [ImVec4_c; 46usize],
+    pub TexUvCorners: [ImVec4_c; 64usize],
 }
 impl Default for ImFontAtlasBuilder {
     fn default() -> Self {
@@ -10769,13 +10855,6 @@ unsafe extern "C" {
     pub fn ImGuiTextFilter_destroy(self_: *mut ImGuiTextFilter);
 }
 unsafe extern "C" {
-    pub fn ImGuiTextFilter_Draw(
-        self_: *mut ImGuiTextFilter,
-        label: *const ::core::ffi::c_char,
-        width: f32,
-    ) -> bool;
-}
-unsafe extern "C" {
     pub fn ImGuiTextFilter_PassFilter(
         self_: *mut ImGuiTextFilter,
         text: *const ::core::ffi::c_char,
@@ -10792,26 +10871,17 @@ unsafe extern "C" {
     pub fn ImGuiTextFilter_IsActive(self_: *mut ImGuiTextFilter) -> bool;
 }
 unsafe extern "C" {
-    pub fn ImGuiTextRange_ImGuiTextRange_Nil() -> *mut ImGuiTextRange;
+    pub fn ImGuiTextFilter_Draw(
+        self_: *mut ImGuiTextFilter,
+        label: *const ::core::ffi::c_char,
+    ) -> bool;
 }
 unsafe extern "C" {
-    pub fn ImGuiTextRange_destroy(self_: *mut ImGuiTextRange);
-}
-unsafe extern "C" {
-    pub fn ImGuiTextRange_ImGuiTextRange_Str(
-        _b: *const ::core::ffi::c_char,
-        _e: *const ::core::ffi::c_char,
-    ) -> *mut ImGuiTextRange;
-}
-unsafe extern "C" {
-    pub fn ImGuiTextRange_empty(self_: *mut ImGuiTextRange) -> bool;
-}
-unsafe extern "C" {
-    pub fn ImGuiTextRange_split(
-        self_: *mut ImGuiTextRange,
-        separator: ::core::ffi::c_char,
-        out: *mut ImVector_ImGuiTextRange,
-    );
+    pub fn ImGuiTextFilter_DrawWithHint(
+        self_: *mut ImGuiTextFilter,
+        label: *const ::core::ffi::c_char,
+        hint: *const ::core::ffi::c_char,
+    ) -> bool;
 }
 unsafe extern "C" {
     pub fn ImGuiTextBuffer_ImGuiTextBuffer() -> *mut ImGuiTextBuffer;
@@ -11135,6 +11205,12 @@ unsafe extern "C" {
     pub fn ImDrawList_PopTexture(self_: *mut ImDrawList);
 }
 unsafe extern "C" {
+    pub fn ImDrawList_PushDrawFlag(self_: *mut ImDrawList, flags: ImDrawFlags, enabled: bool);
+}
+unsafe extern "C" {
+    pub fn ImDrawList_PopDrawFlag(self_: *mut ImDrawList);
+}
+unsafe extern "C" {
     pub fn ImDrawList_GetClipRectMin(self_: *mut ImDrawList) -> ImVec2_c;
 }
 unsafe extern "C" {
@@ -11147,6 +11223,7 @@ unsafe extern "C" {
         p2: ImVec2_c,
         col: ImU32,
         thickness: f32,
+        flags: ImDrawFlags,
     );
 }
 unsafe extern "C" {
@@ -11157,6 +11234,7 @@ unsafe extern "C" {
         y: f32,
         col: ImU32,
         thickness: f32,
+        flags: ImDrawFlags,
     );
 }
 unsafe extern "C" {
@@ -11167,6 +11245,7 @@ unsafe extern "C" {
         max_y: f32,
         col: ImU32,
         thickness: f32,
+        flags: ImDrawFlags,
     );
 }
 unsafe extern "C" {
@@ -11210,6 +11289,7 @@ unsafe extern "C" {
         p4: ImVec2_c,
         col: ImU32,
         thickness: f32,
+        flags: ImDrawFlags,
     );
 }
 unsafe extern "C" {
@@ -11230,6 +11310,7 @@ unsafe extern "C" {
         p3: ImVec2_c,
         col: ImU32,
         thickness: f32,
+        flags: ImDrawFlags,
     );
 }
 unsafe extern "C" {
@@ -11249,6 +11330,7 @@ unsafe extern "C" {
         col: ImU32,
         num_segments: ::core::ffi::c_int,
         thickness: f32,
+        flags: ImDrawFlags,
     );
 }
 unsafe extern "C" {
@@ -11268,6 +11350,7 @@ unsafe extern "C" {
         col: ImU32,
         num_segments: ::core::ffi::c_int,
         thickness: f32,
+        flags: ImDrawFlags,
     );
 }
 unsafe extern "C" {
@@ -11288,6 +11371,7 @@ unsafe extern "C" {
         rot: f32,
         num_segments: ::core::ffi::c_int,
         thickness: f32,
+        flags: ImDrawFlags,
     );
 }
 unsafe extern "C" {
@@ -11332,6 +11416,7 @@ unsafe extern "C" {
         col: ImU32,
         thickness: f32,
         num_segments: ::core::ffi::c_int,
+        flags: ImDrawFlags,
     );
 }
 unsafe extern "C" {
@@ -11343,6 +11428,7 @@ unsafe extern "C" {
         col: ImU32,
         thickness: f32,
         num_segments: ::core::ffi::c_int,
+        flags: ImDrawFlags,
     );
 }
 unsafe extern "C" {
@@ -11361,6 +11447,7 @@ unsafe extern "C" {
         points: *const ImVec2_c,
         num_points: ::core::ffi::c_int,
         col: ImU32,
+        flags: ImDrawFlags,
     );
 }
 unsafe extern "C" {
@@ -11420,7 +11507,7 @@ unsafe extern "C" {
     pub fn ImDrawList_PathLineToMergeDuplicate(self_: *mut ImDrawList, pos: ImVec2_c);
 }
 unsafe extern "C" {
-    pub fn ImDrawList_PathFillConvex(self_: *mut ImDrawList, col: ImU32);
+    pub fn ImDrawList_PathFillConvex(self_: *mut ImDrawList, col: ImU32, flags: ImDrawFlags);
 }
 unsafe extern "C" {
     pub fn ImDrawList_PathFillConcave(self_: *mut ImDrawList, col: ImU32);
@@ -11572,6 +11659,9 @@ unsafe extern "C" {
     pub fn ImDrawList__ResetForNewFrame(self_: *mut ImDrawList);
 }
 unsafe extern "C" {
+    pub fn ImDrawList__SetPixelDensity(self_: *mut ImDrawList, pixel_density: f32);
+}
+unsafe extern "C" {
     pub fn ImDrawList__ClearFreeMemory(self_: *mut ImDrawList);
 }
 unsafe extern "C" {
@@ -11616,6 +11706,74 @@ unsafe extern "C" {
         a_min: f32,
         a_max: f32,
         num_segments: ::core::ffi::c_int,
+    );
+}
+unsafe extern "C" {
+    pub fn ImDrawList__AddRectFilledBaked(
+        self_: *mut ImDrawList,
+        p_min: ImVec2_c,
+        p_max: ImVec2_c,
+        col: ImU32,
+        r: f32,
+        tex_uvs: ImVec4_c,
+        flags: ImDrawFlags,
+    );
+}
+unsafe extern "C" {
+    pub fn ImDrawList__AddRectBaked(
+        self_: *mut ImDrawList,
+        p_min: ImVec2_c,
+        p_max: ImVec2_c,
+        col: ImU32,
+        r: f32,
+        t: f32,
+        tex_uvs: ImVec4_c,
+        flags: ImDrawFlags,
+    );
+}
+unsafe extern "C" {
+    pub fn ImDrawList__AddLine(
+        self_: *mut ImDrawList,
+        p1: ImVec2_c,
+        p2: ImVec2_c,
+        col: ImU32,
+        thickness: f32,
+        flags: ImDrawFlags,
+    );
+}
+unsafe extern "C" {
+    pub fn ImDrawList__AddRectTinyRounding(
+        self_: *mut ImDrawList,
+        p_min: ImVec2_c,
+        p_max: ImVec2_c,
+        col: ImU32,
+        rounding: f32,
+        thickness: f32,
+        flags: ImDrawFlags,
+    );
+}
+unsafe extern "C" {
+    pub fn ImDrawList__SelectLineTexture(
+        self_: *mut ImDrawList,
+        screen_thickness: f32,
+        out_uv0: *mut ImVec2_c,
+        out_uv1: *mut ImVec2_c,
+        out_fringe: *mut f32,
+        flags: ImDrawFlags,
+    );
+}
+unsafe extern "C" {
+    pub fn ImDrawList__CalculateCenterBiasedOffset(self_: *mut ImDrawList, thickness: f32) -> f32;
+}
+unsafe extern "C" {
+    pub fn ImDrawList__AddPolyline(
+        self_: *mut ImDrawList,
+        points: *const ImVec2_c,
+        num_points: ::core::ffi::c_int,
+        col: ImU32,
+        thickness: f32,
+        flags: ImDrawFlags,
+        max_inner_offset: f32,
     );
 }
 unsafe extern "C" {
@@ -11939,7 +12097,19 @@ unsafe extern "C" {
     pub fn ImFont_ClearOutputData(self_: *mut ImFont);
 }
 unsafe extern "C" {
-    pub fn ImFont_AddRemapChar(self_: *mut ImFont, from_codepoint: ImWchar, to_codepoint: ImWchar);
+    pub fn ImFont_AddRemapCodepoint(
+        self_: *mut ImFont,
+        from_codepoint: ImWchar,
+        to_codepoint: ImWchar,
+    );
+}
+unsafe extern "C" {
+    pub fn ImFont_AddRemapCodepointToGlyphIndex(
+        self_: *mut ImFont,
+        from_codepoint: ImWchar,
+        font_src_idx: ::core::ffi::c_int,
+        glyph_idx: ::core::ffi::c_int,
+    );
 }
 unsafe extern "C" {
     pub fn ImFont_IsGlyphRangeUnused(
@@ -12361,16 +12531,41 @@ unsafe extern "C" {
     pub fn igImRsqrt_Float(x: f32) -> f32;
 }
 unsafe extern "C" {
+    pub fn igImRsqrtPrecise(x: f32) -> f32;
+}
+unsafe extern "C" {
     pub fn igImRsqrt_double(x: f64) -> f64;
 }
 unsafe extern "C" {
-    pub fn igImMin(lhs: ImVec2_c, rhs: ImVec2_c) -> ImVec2_c;
+    pub fn igImMin_Int(lhs: ::core::ffi::c_int, rhs: ::core::ffi::c_int) -> ::core::ffi::c_int;
 }
 unsafe extern "C" {
-    pub fn igImMax(lhs: ImVec2_c, rhs: ImVec2_c) -> ImVec2_c;
+    pub fn igImMax_Int(lhs: ::core::ffi::c_int, rhs: ::core::ffi::c_int) -> ::core::ffi::c_int;
 }
 unsafe extern "C" {
-    pub fn igImClamp(v: ImVec2_c, mn: ImVec2_c, mx: ImVec2_c) -> ImVec2_c;
+    pub fn igImClamp_Int(
+        v: ::core::ffi::c_int,
+        mn: ::core::ffi::c_int,
+        mx: ::core::ffi::c_int,
+    ) -> ::core::ffi::c_int;
+}
+unsafe extern "C" {
+    pub fn igImMin_Float(lhs: f32, rhs: f32) -> f32;
+}
+unsafe extern "C" {
+    pub fn igImMax_Float(lhs: f32, rhs: f32) -> f32;
+}
+unsafe extern "C" {
+    pub fn igImClamp_Float(v: f32, mn: f32, mx: f32) -> f32;
+}
+unsafe extern "C" {
+    pub fn igImMin_Vec2(lhs: ImVec2_c, rhs: ImVec2_c) -> ImVec2_c;
+}
+unsafe extern "C" {
+    pub fn igImMax_Vec2(lhs: ImVec2_c, rhs: ImVec2_c) -> ImVec2_c;
+}
+unsafe extern "C" {
+    pub fn igImClamp_Vec2(v: ImVec2_c, mn: ImVec2_c, mx: ImVec2_c) -> ImVec2_c;
 }
 unsafe extern "C" {
     pub fn igImLerp_Vec2Float(a: ImVec2_c, b: ImVec2_c, t: f32) -> ImVec2_c;
@@ -12409,7 +12604,10 @@ unsafe extern "C" {
     pub fn igImTrunc64(f: f32) -> f32;
 }
 unsafe extern "C" {
-    pub fn igImRound64(f: f32) -> f32;
+    pub fn igImRoundPositive64(f: f32) -> f32;
+}
+unsafe extern "C" {
+    pub fn igImRoundSigned64(f: f32) -> f32;
 }
 unsafe extern "C" {
     pub fn igImCeilFast(f: f32) -> f32;
@@ -12439,6 +12637,12 @@ unsafe extern "C" {
     pub fn igImExponentialMovingAverage(avg: f32, sample: f32, n: ::core::ffi::c_int) -> f32;
 }
 unsafe extern "C" {
+    pub fn igImIsTruncated(x: f32) -> bool;
+}
+unsafe extern "C" {
+    pub fn igImIsTruncated4(x: f32, y: f32, z: f32, w: f32) -> bool;
+}
+unsafe extern "C" {
     pub fn igImBezierCubicCalc(
         p1: ImVec2_c,
         p2: ImVec2_c,
@@ -12464,7 +12668,7 @@ unsafe extern "C" {
         p3: ImVec2_c,
         p4: ImVec2_c,
         p: ImVec2_c,
-        tess_tol: f32,
+        max_error: f32,
     ) -> ImVec2_c;
 }
 unsafe extern "C" {
@@ -12686,6 +12890,15 @@ unsafe extern "C" {
         old_size: ::core::ffi::c_int,
         new_size: ::core::ffi::c_int,
     );
+}
+unsafe extern "C" {
+    pub fn ImGuiTextFilterItem_ImGuiTextFilterItem(
+        b: *const ::core::ffi::c_char,
+        e: *const ::core::ffi::c_char,
+    ) -> *mut ImGuiTextFilterItem;
+}
+unsafe extern "C" {
+    pub fn ImGuiTextFilterItem_destroy(self_: *mut ImGuiTextFilterItem);
 }
 unsafe extern "C" {
     pub fn ImGuiPackedDate_ImGuiPackedDate_Nil() -> *mut ImGuiPackedDate;
@@ -13618,6 +13831,12 @@ unsafe extern "C" {
     pub fn igWindowPosRelToAbs(window: *mut ImGuiWindow, p: ImVec2_c) -> ImVec2_c;
 }
 unsafe extern "C" {
+    pub fn igSetNextWindowFlags(flags: ImGuiWindowFlags, enabled: bool);
+}
+unsafe extern "C" {
+    pub fn igSetNextWindowChildFlags(flags: ImGuiChildFlags, enabled: bool);
+}
+unsafe extern "C" {
     pub fn igFocusWindow(window: *mut ImGuiWindow, flags: ImGuiFocusRequestFlags);
 }
 unsafe extern "C" {
@@ -13674,10 +13893,10 @@ unsafe extern "C" {
     pub fn igUpdateCurrentFontSize(restore_font_size_after_scaling: f32);
 }
 unsafe extern "C" {
-    pub fn igSetFontRasterizerDensity(rasterizer_density: f32);
+    pub fn igSetPixelDensity(pixel_density: f32);
 }
 unsafe extern "C" {
-    pub fn igGetFontRasterizerDensity() -> f32;
+    pub fn igGetPixelDensity() -> f32;
 }
 unsafe extern "C" {
     pub fn igGetRoundedFontSize(size: f32) -> f32;
@@ -14540,6 +14759,9 @@ unsafe extern "C" {
     pub fn igRenderDragDropTargetRectForItem(bb: ImRect_c);
 }
 unsafe extern "C" {
+    pub fn igRenderDragDropTargetRectForViewport(viewport_id: ImGuiID, bb: ImRect_c);
+}
+unsafe extern "C" {
     pub fn igRenderDragDropTargetRectEx(draw_list: *mut ImDrawList, bb: ImRect_c, rounding: f32);
 }
 unsafe extern "C" {
@@ -14675,6 +14897,9 @@ unsafe extern "C" {
         tab_bar: *mut ImGuiTabBar,
         tab: *mut ImGuiTabItem,
     ) -> *const ::core::ffi::c_char;
+}
+unsafe extern "C" {
+    pub fn igTabBarGetTabPos(tab_bar: *mut ImGuiTabBar, tab: *mut ImGuiTabItem) -> ImVec2_c;
 }
 unsafe extern "C" {
     pub fn igTabBarAddTab(
@@ -14829,7 +15054,8 @@ unsafe extern "C" {
         draw_list: *mut ImDrawList,
         p_min: ImVec2_c,
         p_max: ImVec2_c,
-        fill_col: ImU32,
+        col: ImU32,
+        alpha: f32,
         grid_step: f32,
         grid_off: ImVec2_c,
         rounding: f32,
@@ -14921,7 +15147,7 @@ unsafe extern "C" {
     );
 }
 unsafe extern "C" {
-    pub fn igTextAligned(align_x: f32, size_x: f32, fmt: *const ::core::ffi::c_char, ...);
+    pub fn igTextAligned(align_x: f32, width: f32, fmt: *const ::core::ffi::c_char, ...);
 }
 unsafe extern "C" {
     pub fn igButtonEx(

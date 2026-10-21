@@ -73,3 +73,22 @@ extern "C" {
     size_t cpp_offset_ImDrawCmd_TexRef() { return offsetof(ImDrawCmd, TexRef); }
     size_t cpp_offset_ImDrawCmd_ElemCount() { return offsetof(ImDrawCmd, ElemCount); }
 }
+
+// Offsets affected by the 1.93.0 rendering overhaul.
+extern "C" {
+    size_t cpp_sizeof_DrawFlagsStack() { return sizeof(ImSmallStack_<ImDrawFlags, 3>); }
+    size_t cpp_offset_ImGuiStyle_AntiAliasedLineEnds() { return offsetof(ImGuiStyle, AntiAliasedLineEnds); }
+    size_t cpp_offset_ImGuiStyle_CurveTessellationMaxError() { return offsetof(ImGuiStyle, CurveTessellationMaxError); }
+    size_t cpp_offset_ImGuiStyle_Colors() { return offsetof(ImGuiStyle, Colors); }
+    size_t cpp_offset_ImGuiIO_ConfigDebugDrawListDefaultsToStrokeLegacy() { return offsetof(ImGuiIO, ConfigDebugDrawListDefaultsToStrokeLegacy); }
+    size_t cpp_offset_ImGuiIO_BackendPlatformName() { return offsetof(ImGuiIO, BackendPlatformName); }
+    size_t cpp_offset_ImGuiPlatformIO_DrawCallback_SetSamplerFromTex() { return offsetof(ImGuiPlatformIO, DrawCallback_SetSamplerFromTex); }
+    size_t cpp_offset_ImGuiPlatformIO_Textures() { return offsetof(ImGuiPlatformIO, Textures); }
+    size_t cpp_offset_ImFontAtlas_TexNextUniqueID() { return offsetof(ImFontAtlas, TexNextUniqueID); }
+    size_t cpp_offset_ImFontAtlas_Builder() { return offsetof(ImFontAtlas, Builder); }
+    size_t cpp_offset_ImFontAtlas_OwnerContext() { return offsetof(ImFontAtlas, OwnerContext); }
+    size_t cpp_offset_ImDrawList_Flags() { return offsetof(ImDrawList, Flags); }
+    size_t cpp_offset_ImDrawList__DrawFlagsStack() { return offsetof(ImDrawList, _DrawFlagsStack); }
+    size_t cpp_offset_ImDrawList__InvFringeScale() { return offsetof(ImDrawList, _InvFringeScale); }
+    size_t cpp_offset_ImDrawList__OwnerName() { return offsetof(ImDrawList, _OwnerName); }
+}

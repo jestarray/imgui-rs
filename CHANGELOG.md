@@ -2,6 +2,29 @@
 
 ## [0.13.0] - Unreleased
 
+### Dear ImGui 1.93.0
+
+- Updated all master/docking and FreeType source variants and all native/WASM
+  bindings to Dear ImGui 1.93.0, using cimgui `c4461a7` and bindgen 0.72.1.
+- Unified drawing flags in `draw_list::DrawFlags`; removed `DrawListFlags` and
+  renamed `ROUND_CORNERS_*` to `ROUND_*` (using `BOTTOM` instead of `BOT`).
+- Added primitive `.flags(...)` builders and panic-safe `with_draw_flag` scopes,
+  including explicit legacy strokes, stroke positioning, joins, caps and AA ends.
+- Replaced `Style::anti_aliased_lines_use_tex` with `anti_aliased_line_ends` and
+  `curve_tessellation_tol` with `curve_tessellation_max_error` (pixels; use the
+  square root of the old tolerance). Added the IO legacy-stroke debug switch.
+- Added `FontAtlasFlags::NO_BAKED_ROUND_CORNERS`, `ItemFlag::MIXED_VALUE`, live-edit
+  item flags, and `TextFilter::draw_with_hint`. Text filters now support AND terms
+  and quoted phrases, and prioritize exclusions. Retained `draw_with_size`.
+- Adopted upstream drawing and theme defaults, including inside strokes for closed
+  shapes, changed half-pixel offsets, and invisible inverted rectangles.
+  `NO_BAKED_LINES` now disables anti-aliased lines and line ends. Renderers need
+  bilinear sampling for textured shapes.
+- Updated handwritten layouts and ABI tests. Source/header changes now invalidate
+  the C++ build. External/WASM modules require rebuilding with matching defines.
+- See [migration guidance](docs/upgrading-imgui.md#migrating-applications-from-1929b-to-1930)
+  for examples and renderer integration notes.
+
 ### Added
 
 - Added `CheckboxSelectedBg` style color

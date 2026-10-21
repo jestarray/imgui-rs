@@ -470,5 +470,16 @@ bitflags::bitflags! {
         /// Allow submitting an item with the same identifier as an item already submitted this frame without triggering
         /// a warning tooltip if [`Io::config_debug_highlight_id_conflicts`](crate::Io::config_debug_highlight_id_conflicts) is set.
         const ALLOW_DUPLICATE_ID = sys::ImGuiItemFlags_AllowDuplicateId as i32;
+        /// Apply text input edits while typing, rather than on validation.
+        const LIVE_EDIT_ON_INPUT_TEXT = sys::ImGuiItemFlags_LiveEditOnInputText as i32;
+        /// Apply scalar input edits while typing, rather than on validation.
+        const LIVE_EDIT_ON_INPUT_SCALAR = sys::ImGuiItemFlags_LiveEditOnInputScalar as i32;
+        /// Enable live editing for both text and scalar inputs.
+        const LIVE_EDIT_ON_INPUT = sys::ImGuiItemFlags_LiveEditOnInput as i32;
+        /// Display a mixed/indeterminate value in supported widgets.
+        ///
+        /// Disable live editing for mixed-value text input to avoid applying undo
+        /// operations to every selected object.
+        const MIXED_VALUE = sys::ImGuiItemFlags_MixedValue as i32;
     }
 }

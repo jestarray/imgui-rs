@@ -7,8 +7,8 @@ IMGUI_DIR=${1:?}
 SCRIPT_DIR=$(dirname ${0} | python3 -c 'import os, sys; print(os.path.abspath(sys.stdin.read().strip()))' )
 
 cd ${SCRIPT_DIR}
-./_update-imgui.sh $IMGUI_DIR v1.92.9b ./imgui-master/imgui
-./_update-imgui.sh $IMGUI_DIR v1.92.9b-docking ./imgui-docking/imgui
+./_update-imgui.sh $IMGUI_DIR v1.93.0 ./imgui-master/imgui
+./_update-imgui.sh $IMGUI_DIR v1.93.0-docking ./imgui-docking/imgui
 
-./_update-imgui.sh $IMGUI_DIR v1.92.9b ./imgui-master-freetype/imgui
-./_update-imgui.sh $IMGUI_DIR v1.92.9b-docking ./imgui-docking-freetype/imgui
+./_update-imgui.sh $IMGUI_DIR v1.93.0 ./imgui-master-freetype/imgui
+./_update-imgui.sh $IMGUI_DIR v1.93.0-docking ./imgui-docking-freetype/imgui

@@ -27,6 +27,13 @@ fn find_freetype() -> Vec<impl AsRef<std::path::Path>> {
 
 // Output define args for compiler
 fn main() -> std::io::Result<()> {
+    println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=tests/abi_compat.cpp");
+    println!("cargo:rerun-if-changed=src/font_atlas_helper.cpp");
+    println!("cargo:rerun-if-changed=include_imgui_master.cpp");
+    println!("cargo:rerun-if-changed=include_imgui_master_freetype.cpp");
+    println!("cargo:rerun-if-changed=include_imgui_docking.cpp");
+    println!("cargo:rerun-if-changed=include_imgui_docking_freetype.cpp");
     let external_enabled = std::env::var_os("CARGO_FEATURE_EXTERNAL").is_some();
 
     if external_enabled {
@@ -59,6 +66,9 @@ fn main() -> std::io::Result<()> {
         (false, true) => "third-party/imgui-master-freetype",
         (true, true) => "third-party/imgui-docking-freetype",
     });
+    // The amalgamation includes these sources indirectly; cc only watches the
+    // top-level translation unit, so vendored upgrades must invalidate the build.
+    println!("cargo:rerun-if-changed={}", cimgui_dir.display());
 
     // For projects like implot-rs we expose the path to our cimgui
     // files, via `DEP_IMGUI_THIRD_PARTY` env-var, so they can build
@@ -120,7 +130,7 @@ fn main() -> std::io::Result<()> {
 
         // Build imgui lib, suppressing warnings.
         build.warnings(false).file(imgui_cpp).compile("libcimgui.a");
-        
+
         // Build font atlas helper (exposes ImFontAtlasBuildMain which cimgui doesn't export)
         let mut helper_build = cc::Build::new();
         helper_build.cpp(true);
@@ -137,15 +147,17 @@ fn main() -> std::io::Result<()> {
             .file("src/font_atlas_helper.cpp")
             .warnings(false)
             .compile("imgui_font_atlas_helper");
-        
+
         // Tell cargo to link the helper library
         println!("cargo:rustc-link-lib=static=imgui_font_atlas_helper");
     }
-    
+
     // Build ABI compatibility test helper
-    // Always compile it - cargo will link it only when running the test
-    compile_abi_test()?;
-    
+    // Native builds compile it; WASM import builds have no local C++ dependency.
+    if !wasm_enabled {
+        compile_abi_test()?;
+    }
+
     Ok(())
 }
 
@@ -153,7 +165,7 @@ fn compile_abi_test() -> std::io::Result<()> {
     let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
     let docking_enabled = std::env::var_os("CARGO_FEATURE_DOCKING").is_some();
     let freetype_enabled = std::env::var_os("CARGO_FEATURE_FREETYPE").is_some();
-    
+
     let cimgui_dir = if freetype_enabled {
         if docking_enabled {
             manifest_dir.join("third-party/imgui-docking-freetype")
@@ -165,39 +177,39 @@ fn compile_abi_test() -> std::io::Result<()> {
     } else {
         manifest_dir.join("third-party/imgui-master")
     };
-    
+
     let mut build = cc::Build::new();
     build.cpp(true);
-    
+
     // Use same flags as cc:Build for C++11 compatibility
     build.flag_if_supported("-std=c++11");
-    
+
     for (key, value) in DEFINES.iter() {
         build.define(key, *value);
     }
-    
+
     // Freetype support - must match main build configuration
     #[cfg(feature = "freetype")]
     if freetype_enabled {
         build.flag_if_supported("-Wno-subobject-linkage");
-        
+
         // Include freetype headers (vcpkg or pkg-config)
         for include in find_freetype() {
             build.include(include);
         }
-        
+
         build.define("CIMGUI_FREETYPE", None);
         build.define("IMGUI_ENABLE_FREETYPE", None);
     }
-    
+
     build
         .include(cimgui_dir.join("imgui"))
         .file("tests/abi_compat.cpp")
         .warnings(false)
         .compile("abi_compat");
-    
+
     // Tell cargo to link the library for tests
     println!("cargo:rustc-link-lib=static=abi_compat");
-    
+
     Ok(())
 }

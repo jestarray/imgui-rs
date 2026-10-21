@@ -2,7 +2,10 @@ use crate::sys;
 use crate::Ui;
 use std::ptr;
 
-/// Helper to parse and apply text filters
+#[cfg(test)]
+mod tests;
+
+/// Helper to parse and apply text filters.
 pub struct TextFilter {
     id: String,
     raw: *mut sys::ImGuiTextFilter,
@@ -48,10 +51,25 @@ impl TextFilter {
     /// The InputText has the size passed in parameters.
     pub fn draw_with_size(&self, size: f32) {
         unsafe {
+            if size != 0.0 {
+                sys::igSetNextItemWidth(size);
+            }
             let mut id = self.id.clone();
             id.push('\0');
             let ptr = id.as_mut_ptr();
-            sys::ImGuiTextFilter_Draw(self.raw, ptr as *mut core::ffi::c_char, size);
+            sys::ImGuiTextFilter_Draw(self.raw, ptr as *mut core::ffi::c_char);
+        }
+    }
+
+    /// Draws the filter with a custom hint. Returns true when the filter changes.
+    /// Use [`Ui::set_next_item_width`] before this call to set its width.
+    pub fn draw_with_hint(&self, hint: &str) -> bool {
+        let mut id = self.id.clone();
+        id.push('\0');
+        let mut hint = hint.to_owned();
+        hint.push('\0');
+        unsafe {
+            sys::ImGuiTextFilter_DrawWithHint(self.raw, id.as_ptr().cast(), hint.as_ptr().cast())
         }
     }
 
@@ -61,6 +79,10 @@ impl TextFilter {
     }
 
     /// Returns true if the buffer matches the filter.
+    ///
+    /// Spaces combine terms with AND, commas combine alternatives with OR,
+    /// quotes match an exact phrase, and `-term` excludes matching text.
+    /// Exclusions take precedence over inclusions.
     ///
     /// [`draw()`](Self::draw) or [`build()`](Self::build) mut be called **before** this function.
     pub fn pass_filter(&self, buf: &str) -> bool {
@@ -92,6 +114,12 @@ impl TextFilter {
         unsafe {
             sys::ImGuiTextFilter_Clear(self.raw);
         }
+    }
+}
+
+impl Drop for TextFilter {
+    fn drop(&mut self) {
+        unsafe { sys::ImGuiTextFilter_destroy(self.raw) };
     }
 }
 

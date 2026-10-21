@@ -38,7 +38,7 @@ fn lint_all() -> Result<()> {
     xshell::cmd!("cargo clippy --workspace --all-targets").run()?;
     xshell::cmd!("cargo clippy --workspace --all-targets --features docking").run()?;
     xshell::cmd!("cargo clippy --workspace --all-targets --features freetype").run()?;
-    xshell::cmd!("cargo clippy --workspace --all-targets --all-features").run()?;
+    xshell::cmd!("cargo clippy --workspace --all-targets --features docking,freetype").run()?;
 
     // Check formatting
     xshell::cmd!("cargo fmt --all -- --check").run()?;
@@ -50,6 +50,18 @@ fn test_all() -> Result<()> {
     xshell::cmd!("cargo test --workspace --all-targets").run()?;
     xshell::cmd!("cargo test --workspace --all-targets --features docking").run()?;
     xshell::cmd!("cargo test --workspace --all-targets --features freetype").run()?;
+    xshell::cmd!("cargo test --workspace --all-targets --features docking,freetype").run()?;
+
+    // WASM imports are checked without trying to link a native test executable.
+    xshell::cmd!("cargo check -p imgui --target wasm32-unknown-unknown --features wasm").run()?;
+    xshell::cmd!("cargo check -p imgui --target wasm32-unknown-unknown --features wasm,docking")
+        .run()?;
+    xshell::cmd!("cargo check -p imgui --target wasm32-unknown-unknown --features wasm,freetype")
+        .run()?;
+    xshell::cmd!(
+        "cargo check -p imgui --target wasm32-unknown-unknown --features wasm,docking,freetype"
+    )
+    .run()?;
 
     // Test doc examples
     xshell::cmd!("cargo test --workspace --doc").run()?;

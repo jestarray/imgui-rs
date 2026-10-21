@@ -211,6 +211,8 @@ pub struct Io {
     pub config_debug_begin_return_value_once: bool,
     pub config_debug_begin_return_value_loop: bool,
     pub config_debug_ignore_focus_loss: bool,
+    /// Default all draw lists to pre-1.93 stroke behavior for visual comparison.
+    pub config_debug_draw_list_defaults_to_stroke_legacy: bool,
 
     pub(crate) backend_platform_name: *const c_char,
     pub(crate) backend_renderer_name: *const c_char,
@@ -362,12 +364,12 @@ impl Io {
 
     pub fn add_key_event(&mut self, key: Key, down: bool) {
         unsafe {
-            sys::ImGuiIO_AddKeyEvent(self.raw_mut(), key as u32, down);
+            sys::ImGuiIO_AddKeyEvent(self.raw_mut(), key as sys::ImGuiKey, down);
         }
     }
 
     /// Queue a gain/loss of focus for the application (generally based on OS/platform focus of your window)
-    /// Note: [`io.config_debug_ignore_focus_loss`] will ignore this event from firing
+    /// Note: [`Io::config_debug_ignore_focus_loss`] will ignore this event from firing
     #[doc(alias = "AddFocusEvent")]
     pub fn add_focus_event(&mut self, focused: bool) {
         unsafe {
@@ -377,7 +379,7 @@ impl Io {
 
     pub fn add_key_analog_event(&mut self, key: Key, down: bool, value: f32) {
         unsafe {
-            sys::ImGuiIO_AddKeyAnalogEvent(self.raw_mut(), key as u32, down, value);
+            sys::ImGuiIO_AddKeyAnalogEvent(self.raw_mut(), key as sys::ImGuiKey, down, value);
         }
     }
 }
@@ -430,8 +432,14 @@ fn test_io_memory_layout() {
             assert_field_offset!(font_default, FontDefault);
             assert_field_offset!(font_allow_user_scaling, FontAllowUserScaling);
             assert_field_offset!(config_color_edit_flags, ConfigColorEditFlags);
-            assert_field_offset!(config_ini_settings_save_last_used_date, ConfigIniSettingsSaveLastUsedDate);
-            assert_field_offset!(config_ini_settings_auto_discard_months, ConfigIniSettingsAutoDiscardMonths);
+            assert_field_offset!(
+                config_ini_settings_save_last_used_date,
+                ConfigIniSettingsSaveLastUsedDate
+            );
+            assert_field_offset!(
+                config_ini_settings_auto_discard_months,
+                ConfigIniSettingsAutoDiscardMonths
+            );
             assert_field_offset!(config_nav_swap_gamepad_buttons, ConfigNavSwapGamepadButtons);
             assert_field_offset!(config_nav_move_set_mouse_pos, ConfigNavMoveSetMousePos);
             assert_field_offset!(config_nav_capture_keyboard, ConfigNavCaptureKeyboard);
@@ -444,7 +452,10 @@ fn test_io_memory_layout() {
                 ConfigNavEscapeClearFocusWindow
             );
             assert_field_offset!(config_nav_cursor_visible_auto, ConfigNavCursorVisibleAuto);
-            assert_field_offset!(config_nav_cursor_visible_always, ConfigNavCursorVisibleAlways);
+            assert_field_offset!(
+                config_nav_cursor_visible_always,
+                ConfigNavCursorVisibleAlways
+            );
             #[cfg(feature = "docking")]
             assert_field_offset!(config_docking_no_split, ConfigDockingNoSplit);
             #[cfg(feature = "docking")]
@@ -454,17 +465,29 @@ fn test_io_memory_layout() {
             #[cfg(feature = "docking")]
             assert_field_offset!(config_docking_always_tab_bar, ConfigDockingAlwaysTabBar);
             #[cfg(feature = "docking")]
-            assert_field_offset!(config_docking_transparent_payload, ConfigDockingTransparentPayload);
+            assert_field_offset!(
+                config_docking_transparent_payload,
+                ConfigDockingTransparentPayload
+            );
             #[cfg(feature = "docking")]
             assert_field_offset!(config_viewports_no_auto_merge, ConfigViewportsNoAutoMerge);
             #[cfg(feature = "docking")]
-            assert_field_offset!(config_viewports_no_task_bar_icon, ConfigViewportsNoTaskBarIcon);
+            assert_field_offset!(
+                config_viewports_no_task_bar_icon,
+                ConfigViewportsNoTaskBarIcon
+            );
             #[cfg(feature = "docking")]
             assert_field_offset!(config_viewports_no_decoration, ConfigViewportsNoDecoration);
             #[cfg(feature = "docking")]
-            assert_field_offset!(config_viewports_no_default_parent, ConfigViewportsNoDefaultParent);
+            assert_field_offset!(
+                config_viewports_no_default_parent,
+                ConfigViewportsNoDefaultParent
+            );
             #[cfg(feature = "docking")]
-            assert_field_offset!(config_viewports_platform_focus_sets_imgui_focus, ConfigViewportsPlatformFocusSetsImGuiFocus);
+            assert_field_offset!(
+                config_viewports_platform_focus_sets_imgui_focus,
+                ConfigViewportsPlatformFocusSetsImGuiFocus
+            );
             #[cfg(feature = "docking")]
             assert_field_offset!(config_dpi_scale_fonts, ConfigDpiScaleFonts);
             #[cfg(feature = "docking")]
@@ -481,7 +504,10 @@ fn test_io_memory_layout() {
                 ConfigInputTextEnterKeepActive
             );
             assert_field_offset!(config_drag_click_to_input_text, ConfigDragClickToInputText);
-            assert_field_offset!(config_windows_resize_from_edges, ConfigWindowsResizeFromEdges);
+            assert_field_offset!(
+                config_windows_resize_from_edges,
+                ConfigWindowsResizeFromEdges
+            );
             assert_field_offset!(
                 config_windows_move_from_title_bar_only,
                 ConfigWindowsMoveFromTitleBarOnly
@@ -491,8 +517,14 @@ fn test_io_memory_layout() {
                 ConfigWindowsCopyContentsWithCtrlC
             );
             assert_field_offset!(config_scrollbar_scroll_by_page, ConfigScrollbarScrollByPage);
-            assert_field_offset!(config_ini_settings_save_last_used_date, ConfigIniSettingsSaveLastUsedDate);
-            assert_field_offset!(config_ini_settings_auto_discard_months, ConfigIniSettingsAutoDiscardMonths);
+            assert_field_offset!(
+                config_ini_settings_save_last_used_date,
+                ConfigIniSettingsSaveLastUsedDate
+            );
+            assert_field_offset!(
+                config_ini_settings_auto_discard_months,
+                ConfigIniSettingsAutoDiscardMonths
+            );
             assert_field_offset!(config_debug_ini_settings, ConfigDebugIniSettings);
             assert_field_offset!(mouse_draw_cursor, MouseDrawCursor);
             assert_field_offset!(config_memory_compact_timer, ConfigMemoryCompactTimer);
@@ -515,15 +547,31 @@ fn test_io_memory_layout() {
                 config_error_recovery_enable_tooltip,
                 ConfigErrorRecoveryEnableTooltip
             );
-            assert_field_offset!(config_debug_is_debugger_present, ConfigDebugIsDebuggerPresent);
-            assert_field_offset!(config_debug_highlight_id_conflicts, ConfigDebugHighlightIdConflicts);
+            assert_field_offset!(
+                config_debug_is_debugger_present,
+                ConfigDebugIsDebuggerPresent
+            );
+            assert_field_offset!(
+                config_debug_highlight_id_conflicts,
+                ConfigDebugHighlightIdConflicts
+            );
             assert_field_offset!(
                 config_debug_highlight_id_conflicts_show_item_picker,
                 ConfigDebugHighlightIdConflictsShowItemPicker
             );
-            assert_field_offset!(config_debug_begin_return_value_once, ConfigDebugBeginReturnValueOnce);
-            assert_field_offset!(config_debug_begin_return_value_loop, ConfigDebugBeginReturnValueLoop);
+            assert_field_offset!(
+                config_debug_begin_return_value_once,
+                ConfigDebugBeginReturnValueOnce
+            );
+            assert_field_offset!(
+                config_debug_begin_return_value_loop,
+                ConfigDebugBeginReturnValueLoop
+            );
             assert_field_offset!(config_debug_ignore_focus_loss, ConfigDebugIgnoreFocusLoss);
+            assert_field_offset!(
+                config_debug_draw_list_defaults_to_stroke_legacy,
+                ConfigDebugDrawListDefaultsToStrokeLegacy
+            );
             assert_field_offset!(config_debug_ini_settings, ConfigDebugIniSettings);
             assert_field_offset!(backend_platform_name, BackendPlatformName);
             assert_field_offset!(backend_renderer_name, BackendRendererName);

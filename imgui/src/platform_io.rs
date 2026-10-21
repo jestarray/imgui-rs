@@ -30,12 +30,14 @@ pub struct PlatformIo {
     draw_callback_reset_render_state: sys::ImDrawCallback,
     draw_callback_set_sampler_linear: sys::ImDrawCallback,
     draw_callback_set_sampler_nearest: sys::ImDrawCallback,
+    draw_callback_set_sampler_from_tex: sys::ImDrawCallback,
     pub platform_create_window: Option<unsafe extern "C" fn(*mut sys::ImGuiViewport)>,
     pub platform_destroy_window: Option<unsafe extern "C" fn(*mut sys::ImGuiViewport)>,
     pub platform_show_window: Option<unsafe extern "C" fn(*mut sys::ImGuiViewport)>,
     pub platform_set_window_pos:
         Option<unsafe extern "C" fn(*mut sys::ImGuiViewport, sys::ImVec2_c)>,
-    pub platform_get_window_pos: Option<unsafe extern "C" fn(*mut sys::ImGuiViewport) -> sys::ImVec2_c>,
+    pub platform_get_window_pos:
+        Option<unsafe extern "C" fn(*mut sys::ImGuiViewport) -> sys::ImVec2_c>,
     pub platform_set_window_size:
         Option<unsafe extern "C" fn(*mut sys::ImGuiViewport, sys::ImVec2_c)>,
     pub platform_get_window_size:
@@ -48,13 +50,10 @@ pub struct PlatformIo {
         Option<unsafe extern "C" fn(*mut sys::ImGuiViewport) -> bool>,
     pub platform_set_window_title:
         Option<unsafe extern "C" fn(*mut sys::ImGuiViewport, *const c_char)>,
-    pub platform_set_window_alpha:
-        Option<unsafe extern "C" fn(*mut sys::ImGuiViewport, f32)>,
+    pub platform_set_window_alpha: Option<unsafe extern "C" fn(*mut sys::ImGuiViewport, f32)>,
     pub platform_update_window: Option<unsafe extern "C" fn(*mut sys::ImGuiViewport)>,
-    pub platform_render_window:
-        Option<unsafe extern "C" fn(*mut sys::ImGuiViewport, *mut c_void)>,
-    pub platform_swap_buffers:
-        Option<unsafe extern "C" fn(*mut sys::ImGuiViewport, *mut c_void)>,
+    pub platform_render_window: Option<unsafe extern "C" fn(*mut sys::ImGuiViewport, *mut c_void)>,
+    pub platform_swap_buffers: Option<unsafe extern "C" fn(*mut sys::ImGuiViewport, *mut c_void)>,
     pub platform_get_window_dpi_scale: Option<unsafe extern "C" fn(*mut sys::ImGuiViewport) -> f32>,
     pub platform_on_changed_viewport: Option<unsafe extern "C" fn(*mut sys::ImGuiViewport)>,
     pub platform_get_window_work_area_insets:
@@ -71,10 +70,8 @@ pub struct PlatformIo {
     pub renderer_destroy_window: Option<unsafe extern "C" fn(*mut sys::ImGuiViewport)>,
     pub renderer_set_window_size:
         Option<unsafe extern "C" fn(*mut sys::ImGuiViewport, sys::ImVec2_c)>,
-    pub renderer_render_window:
-        Option<unsafe extern "C" fn(*mut sys::ImGuiViewport, *mut c_void)>,
-    pub renderer_swap_buffers:
-        Option<unsafe extern "C" fn(*mut sys::ImGuiViewport, *mut c_void)>,
+    pub renderer_render_window: Option<unsafe extern "C" fn(*mut sys::ImGuiViewport, *mut c_void)>,
+    pub renderer_swap_buffers: Option<unsafe extern "C" fn(*mut sys::ImGuiViewport, *mut c_void)>,
     pub monitors: sys::ImVector_ImGuiPlatformMonitor,
     pub textures: sys::ImVector_ImTextureDataPtr,
     pub viewports: sys::ImVector_ImGuiViewportPtr,
@@ -107,6 +104,7 @@ pub struct PlatformIo {
     draw_callback_reset_render_state: sys::ImDrawCallback,
     draw_callback_set_sampler_linear: sys::ImDrawCallback,
     draw_callback_set_sampler_nearest: sys::ImDrawCallback,
+    draw_callback_set_sampler_from_tex: sys::ImDrawCallback,
     pub textures: sys::ImVector_ImTextureDataPtr,
 }
 
@@ -145,6 +143,22 @@ fn test_platform_io_memory_layout() {
     assert_field_offset!(renderer_texture_max_width, Renderer_TextureMaxWidth);
     assert_field_offset!(renderer_texture_max_height, Renderer_TextureMaxHeight);
     assert_field_offset!(renderer_render_state, Renderer_RenderState);
+    assert_field_offset!(
+        draw_callback_reset_render_state,
+        DrawCallback_ResetRenderState
+    );
+    assert_field_offset!(
+        draw_callback_set_sampler_linear,
+        DrawCallback_SetSamplerLinear
+    );
+    assert_field_offset!(
+        draw_callback_set_sampler_nearest,
+        DrawCallback_SetSamplerNearest
+    );
+    assert_field_offset!(
+        draw_callback_set_sampler_from_tex,
+        DrawCallback_SetSamplerFromTex
+    );
     assert_field_offset!(platform_create_window, Platform_CreateWindow);
     assert_field_offset!(platform_destroy_window, Platform_DestroyWindow);
     assert_field_offset!(platform_show_window, Platform_ShowWindow);
@@ -212,12 +226,25 @@ fn test_platform_io_memory_layout() {
     assert_field_offset!(ime_user_data, Platform_ImeUserData);
     assert_field_offset!(locale_decimal_point, Platform_LocaleDecimalPoint);
     assert_field_offset!(renderer_texture_max_width, Renderer_TextureMaxWidth);
-        assert_field_offset!(renderer_texture_max_height, Renderer_TextureMaxHeight);
-        assert_field_offset!(renderer_render_state, Renderer_RenderState);
-        assert_field_offset!(draw_callback_reset_render_state, DrawCallback_ResetRenderState);
-        assert_field_offset!(draw_callback_set_sampler_linear, DrawCallback_SetSamplerLinear);
-        assert_field_offset!(draw_callback_set_sampler_nearest, DrawCallback_SetSamplerNearest);
-        assert_field_offset!(textures, Textures);
+    assert_field_offset!(renderer_texture_max_height, Renderer_TextureMaxHeight);
+    assert_field_offset!(renderer_render_state, Renderer_RenderState);
+    assert_field_offset!(
+        draw_callback_reset_render_state,
+        DrawCallback_ResetRenderState
+    );
+    assert_field_offset!(
+        draw_callback_set_sampler_linear,
+        DrawCallback_SetSamplerLinear
+    );
+    assert_field_offset!(
+        draw_callback_set_sampler_nearest,
+        DrawCallback_SetSamplerNearest
+    );
+    assert_field_offset!(
+        draw_callback_set_sampler_from_tex,
+        DrawCallback_SetSamplerFromTex
+    );
+    assert_field_offset!(textures, Textures);
 }
 
 /// Describes an ImGui Viewport.
